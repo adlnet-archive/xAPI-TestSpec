@@ -16,7 +16,7 @@
 
 ---
 
-[https://github.com/adlnet/xAPI-TestSpec/blob/master/]("external")
+[https://github.com/adlnet/xAPI-TestSpec/blob/master/](external)
 
 
 <table border="1">
