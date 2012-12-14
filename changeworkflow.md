@@ -12,8 +12,15 @@ copy of the Experience API repository. This fork gives you the ability to edit y
 version of the document without impacting the master copy.
 
 ### Install Git (use cmd line) or Install Windows/Mac GitHub client
+#### Git
+Download [git install](http://git-scm.com/downloads)
+#### GitHub Client
+__mac:__ http://mac.github.com/
+__windows:__ http://windows.github.com/
 
 ### Clone your GitHub fork to your machine
+#### Git
+```git clone <url_to_your_repository>```
 
 ### Add ADL repository as upstream remote
 
