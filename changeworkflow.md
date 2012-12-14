@@ -51,7 +51,7 @@ gives you an option to clone it.
 Add a remote repository to git to reference the base repository. This will make 
 synchronizing with the base respository a bit easier.  
 
-__Git__
+__Git__  
 ```git remote add upstream <url_to_base_repository>```  
 
 __GitHub Client__  
@@ -60,22 +60,48 @@ repository. In order to do this, open your repository on the GitHub client
 app home screen. On the repository screen select 'tools' and 'open a shell 
 here'. Alternatively use the 'Git Shell' shortcut if it was created during 
 installation.  
-In the shell, enter..
+In the shell, enter..  
 ```git remote add upstream <url_to_base_repository>```  
 
 
 ## Workflow
 
 ### Sync up with Base ADL Repository
+Pull down changes from the base repository. This automatically does a 
+fetch of the base repository and a merge into your local repository.  
+
+__Git and GitHub Client__
+```git pull upstream master```
 
 ### Make Changes Locally
+Edit the local copy of the file, save and commit. Rule of thumb: Use commits 
+like save points. Commit to indicate logical groups of edits, and places 
+where the edits could be safely rolled back.  
+
+__Git__  
+```git commit -a -m "<commit message>"```  
+
+__GitHub Client__
+The GitHub client will detect saved changes to the documents in your 
+local repository and present a button to commit your edits at the top 
+right of the repository screen.  
 
 ### Push Changes to Your Repository (Origin)
+Pushing your changes to your remote GitHub repository stages the files 
+so that you can then make requests to the base repository to merge in 
+your changes.
+
+__Git__  
+```git push origin```
+
+__GitHub Client__
+The GitHub client has a 'sync' button at the top of the repository screen. 
+This will synchronize your local and remote (origin) repository.  
 
 ### Submit a Pull Request to Base ADL Repository (Upstream)
-When you forked from the Experience API repository, a link back to the base repository 
-is remembered. To send your changes back the the base repository, click the "Pull Request" 
-button at the top of your repository page. This will direct you to a page that gives 
-you the ability to submit a request to the base repository to merge in the changes you 
-committed.
+When you forked from the Experience API repository, a link back to the base 
+repository is remembered. To send your changes back the the base repository, 
+click the "Pull Request" button at the top of your repository page. This will 
+direct you to a page that gives you the ability to submit a request to the 
+base repository to merge in the changes you committed.
 
