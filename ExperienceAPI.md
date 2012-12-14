@@ -7,7 +7,7 @@
 >send all feedback and inquiries to helpdesk@adlnet.gov  
 
 # Table of Contents
-1.0. Revision History  
+[1.0. Revision History](#1.0)  
 2.0. Role of the Experience API  
   2.1. ADL's Role in the Experience API  
   2.2. Contributors  
@@ -51,7 +51,8 @@ Appendix A: Bookmarklet
 Appendix B: Creating an "IE Mode" Request  
 Appendix C: Example definitions for activities of type "cmi.interaction"  
 
-# Revision History
+<a name="1.0"/>  
+# 1.0 Revision History
 _0.8 (Project Tin Can API Deliverable) to 0.9 (March 31, 2012):_
   
 Rustici software, whom delivered Project Tin Can API, made modifications to the 
