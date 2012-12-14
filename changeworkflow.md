@@ -20,12 +20,12 @@ You need to install Git to work with a GitHub repository. If you are on a Window
 or Mac, you can download the GitHub client app. Otherwise install git from the 
 git site.
 
-#### Git
+__Git__
 This provides a command line client app for working with a git repository (like 
 itHub)  
 Download and run [git install](http://git-scm.com/downloads)
 
-#### GitHub Client
+__GitHub Client__
 GitHub Client provides a GUI interface to simplify working with a repository on 
 GitHub. This does not currently support synchronizing with a base repository so 
 some commands will still need to be completed using the command line.
@@ -35,7 +35,7 @@ __windows:__ http://windows.github.com/
 
 
 ### Clone your GitHub fork to your machine
-#### Git
+__Git__
 To make edits and work on the files in the repository, clone your repository to 
 your local machine using Git. The url is provided on the home page of your 
 repository (ex. https://github.com/adlnet/ADL_LRS.git)
