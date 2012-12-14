@@ -70,7 +70,7 @@ In the shell, enter..
 Pull down changes from the base repository. This automatically does a 
 fetch of the base repository and a merge into your local repository.  
 
-__Git and GitHub Client__
+__Git and GitHub Client__  
 ```git pull upstream master```
 
 ### Make Changes Locally
@@ -81,7 +81,7 @@ where the edits could be safely rolled back.
 __Git__  
 ```git commit -a -m "<commit message>"```  
 
-__GitHub Client__
+__GitHub Client__  
 The GitHub client will detect saved changes to the documents in your 
 local repository and present a button to commit your edits at the top 
 right of the repository screen.  
@@ -94,7 +94,7 @@ your changes.
 __Git__  
 ```git push origin```
 
-__GitHub Client__
+__GitHub Client__  
 The GitHub client has a 'sync' button at the top of the repository screen. 
 This will synchronize your local and remote (origin) repository.  
 
