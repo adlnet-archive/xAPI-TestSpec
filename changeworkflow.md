@@ -22,7 +22,7 @@ git site.
 
 __Git__  
 This provides a command line client app for working with a git repository (like 
-itHub)  
+GitHub)  
 Download and run [git install](http://git-scm.com/downloads)
 
 __GitHub Client__  
@@ -35,13 +35,33 @@ __windows:__ http://windows.github.com/
 
 
 ### Clone your GitHub fork to your machine
-__Git__  
 To make edits and work on the files in the repository, clone your repository to 
 your local machine using Git. The url is provided on the home page of your 
-repository (ex. https://github.com/adlnet/ADL_LRS.git)
-```git clone <url_to_your_repository>```
+repository (ex. https://github.com/adlnet/ADL_LRS.git)  
+
+__Git__  
+```git clone <url_to_your_repository>```  
+
+__GitHub Client__  
+On the home screen of the client app, select your account under 'github' and 
+choose the repository you want to clone. Selecting the repository from the list 
+gives you an option to clone it. 
 
 ### Add ADL repository as upstream remote
+Add a remote repository to git to reference the base repository. This will make 
+synchronizing with the base respository a bit easier.  
+
+__Git__
+```git remote add upstream <url_to_base_repository>```  
+
+__GitHub Client__  
+Currently the GitHub clients don't have a way to synchronize with a base 
+repository. In order to do this, open your repository on the GitHub client 
+app home screen. On the repository screen select 'tools' and 'open a shell 
+here'. Alternatively use the 'Git Shell' shortcut if it was created during 
+installation.  
+In the shell, enter..
+```git remote add upstream <url_to_base_repository>```  
 
 
 ## Workflow
