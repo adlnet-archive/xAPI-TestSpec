@@ -414,7 +414,29 @@ about revealing identifying information such as emails, it SHOULD instead use
 an account with an opaque account name to identify the person.  
 
 The table below lists all properties of Agent objects. Inverse functional 
-identifiers are marked with a *."
+identifiers are marked with a *."  
+<table>
+	<tr><th>Property</th><th>Description</th></tr>
+	<tr>
+		<td>objectType</td>
+		<td>"Agent" (Optional, except when used as a statement's object)</td>
+	</tr>
+	<tr><td>name</td><td>String (Optional)</td></tr>
+	<tr>
+		<td><a href="http://xmlns.com/foaf/spec/%22%20%5Cl%20%22term_mbox">mbox*</a></td>
+		<td>String in the form "mailto:email address". (Note: Only emails that 
+			have only ever been and will ever be assigned to this Agent, 
+			but no others, should be used for this property and mbox_sha1sum).</td>
+	</tr>
+	<tr>
+		<td><a href="http://xmlns.com/foaf/spec/%22%20%5Cl%20%22term_mbox_sha1sum">mbox_sha1sum*</a></td>
+		<td>String containing the SHA1 hash of a mailto URI (such as goes in an mbox 
+			property). An LRS MAY include Agents with a matching hash when a 
+			request is based on an mbox.</td>
+	</tr>
+	<tr><td>openid*</td><td>The URI of an openid that uniquely identifies this agent.</td></tr>
+	<tr><td>account*</td><td>An account object, see below.</td></tr>
+</table>
  
 <a name="4.1.3"/> 
 <a name="4.1.4"/> 
