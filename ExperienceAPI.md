@@ -196,7 +196,7 @@ organizations that provided invaluable feedback to SCORM, distributed learning
 efforts, and learning in general.  User Voice Site, Rustici Blog, etc.  
 
 <a name="3.0"/> 
-## 3.0 Definitions  
+# 3.0 Definitions  
 
 __Experience API (XAPI)__: The API defined in this document, the product of 
 "Project Tin Can API". A simple, lightweight way for any permitted actor to store 
@@ -259,9 +259,163 @@ __Community of Practice__: A group, usually connected by a common cause, role or
 purpose, which operates in a common modality.
 
 <a name="4.0"/> 
-<a name="4.1"/> 
+#4.0 Statement  
+The statement is the core of the XAPI.  All learning events are stored as statements 
+such as: "I did this".  
+
+<a name="4.1"/>
+##4.1 Statement Properties:  
+Actor, verb, and object are required, all other properties are optional. Properties 
+can occur in any order, but are limited to one use each. Each property is discussed 
+below.  
+
+<table>
+	<tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
+	<tr><td>id</td><td>UUID</td><td></td>
+	<td>UUID assigned by LRS or other trusted source.</td></tr>
+	<tr><td>actor</td><td>Object</td><td></td>
+	<td>Who the statement is about, as an Agent or Group object. 'I'</td></tr>
+	<tr><td>verb</td><td>Object</td><td></td>
+	<td>Action of the Learner or Team object. "Did".</td></tr>
+	<tr><td>object</td><td>Object</td><td></td>
+	<td>Activity, agent, or another statement that is the object of the statement, 
+	"this". Note that objects which are provided as a value for this field should 
+	include a "objectType" field. If not specified, the object is assumed to be 
+	an activity.</td></tr>
+	<tr><td>result</td><td>Object</td><td></td>
+	<td>Result object, further details relevant to the specified verb.</td></tr>
+	<tr><td>context</td><td>Object</td><td></td>
+	<td>Context that gives the statement more meaning. Examples: Team actor is 
+	working with, altitude in a flight simulator.</td></tr>
+	<tr><td>timestamp</td><td>Date/Time</td><td></td>
+	<td>Timestamp (Formatted according to [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601#Durations)) 
+	of when what this statement describes happened. If not provided, LRS 
+	should set this to the value of "stored" time.</td></tr>
+	<tr><td>stored</td><td>Date/Time</td><td></td>
+	<td>Timestamp (Formatted according to [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601#Durations)) 
+	of when this statement was recorded. Set by LRS.</td></tr>
+	<tr><td>authority</td><td>Object</td><td></td>
+	<td>Agent who is asserting this statement is true. Verified by LRS based on 
+	authentication, and set by LRS if left blank.</td></tr>
+	<tr><td>voided</td><td>Boolean</td><td>false</td>
+	<td>Indicates that the statement has been voided (see below)</td></tr>
+</table>  
+Aside from (potential or required) assignments of properties during initial 
+processing ("id", "authority", "stored", "timestamp"), and the special case of 
+updating the "voided" flag, statements are immutable. Note that the content of 
+activities that are referenced in statements are not considered part of the 
+statement itself. So while the statement is immutable, the activities referenced 
+by that statement are not. This means a deep serialization of a statement into 
+JSON will change if the referenced activities change.  
+
+Example of a simple statement:  
+```
+{
+	"id":"fd41c918-b88b-4b20-a0a5-a4c32391aaa0",
+	"actor":{
+		"objectType": "Agent",
+		"name":"Project Tin Can API",
+		"mbox":"mailto:user@example.com"
+	},
+	"verb":{
+		"id":"http://adlnet.gov/expapi/verbs/created",
+		"display":{ "en-US":"created" }
+	},
+	"object":{
+		"id":"http://example.adlnet.gov/xapi/example/simplestatement",
+		"definition":{
+		"name":{ "en-US":"simple statement" },
+		"description":{ "en-US":"A simple Experience API statement. Note that the LRS 
+		does not need to have any prior information about the actor (learner), the 
+		verb, or the activity/object." }
+		}
+	}
+}
+```   
+Simplest possible statement using all properties that MUST or SHOULD be used:  
+```
+{
+	"actor":{
+		"objectType": "Agent",
+		"mbox":"mailto:xapi@adlnet.gov"
+	},
+	"verb":{
+		"id":"http://adlnet.gov/expapi/verbs/created",
+		"display":{
+			"en-US":"created"
+		}
+	},
+	"object":{
+		"id":"http://example.adlnet.gov/xapi/example/activity"
+	}
+}
+```   
+Typical simple completion with verb "attempted":  
+```
+{
+	"actor":{
+        "objectType": "Agent",
+		"name":"Example Learner",
+		"mbox":"mailto:example.learner@adlnet.gov"
+	},
+	"verb":{
+		"id":"http://adlnet.gov/expapi/verbs/attempted",
+		"display":{
+			"en-US":"attempted"
+		}
+	},
+	"object":{
+		"id":"http://example.adlnet.gov/xapi/example/simpleCBT",
+		"definition":{
+			"name":{
+				"en-US":"simple CBT course"
+			},
+			"description":{
+				"en-US":"A fictitious example CBT course."
+			}
+		}
+	},
+	"result":{
+		"score":{
+			"scaled":0.95
+		},
+		"success":true,
+		"completion":true
+	}
+}
+```  
 <a name="4.1.1"/> 
-<a name="4.1.2"/> 
+### 4.1.1 ID:  
+
+The statement ID is a UUID which MAY be generated by the Learning Activity Provider. 
+If a statement is posted without an ID, the LRS MUST assign one.  
+
+<a name="4.1.2"/>
+### 4.1.2 Actor:  
+
+The actor field contains an Agent or Group object, loosely inspired by Friend 
+Of A Friend (FOAF, http://xmlns.com/foaf/spec/#term_Agent ), a widely accepted 
+vocabulary for describing identifiable individuals and groups.  
+
+#### 4.1.2.1 Agent:  
+
+An Agent object is identified by an email address (or its hash), OpenID, or 
+account on some system (such as twitter), but only for values where any two 
+Agents that share the same identifying property definitely represent the same 
+identity. The term used for properties with that characteristic is "inverse 
+functional identifiers”.  In addition to the standard inverse functional 
+properties from FOAF of mbox, mbox_sha1sum, and openid, account is an inverse 
+functional property in XAPI Agents.  
+
+For reasons of practicality and privacy, TCAPI Agents MUST be identified by 
+one and only one inverse functional identifier. Agents MUST NOT include more 
+than one inverse functional identifier. If an Activity Provider is concerned 
+about revealing identifying information such as emails, it SHOULD instead use 
+an account with an opaque account name to identify the person.  
+
+The table below lists all properties of Agent objects. Inverse functional 
+identifiers are marked with a *."
+ 
 <a name="4.1.3"/> 
 <a name="4.1.4"/> 
 <a name="4.1.5"/> 
