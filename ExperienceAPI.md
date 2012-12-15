@@ -7,51 +7,51 @@
 >send all feedback and inquiries to helpdesk@adlnet.gov  
 
 # Table of Contents
-[1.0. Revision History](#1.0)  
-[2.0. Role of the Experience API](#2.0)  
-    [2.1. ADL's Role in the Experience API](#2.1)  
-    [2.2. Contributors](#2.2)  
-      [2.2.1. Working Group Participants](#2.2.1)  
-      [2.2.2. Requirements Gathering Participants](#2.2.2)  
-[3.0. Definitions](#3.0)  
+[1.0. Revision History](#revhistory)  
+[2.0. Role of the Experience API](#roleofxapi)  
+    [2.1. ADL's Role in the Experience API](#adlrole)  
+    [2.2. Contributors](#contributors)  
+      [2.2.1. Working Group Participants](#wg)  
+      [2.2.2. Requirements Gathering Participants](#reqparticipants)  
+[3.0. Definitions](#defintions)  
     [Tin Can API (TCAPI)](#tcapi)  
-[4.0. Statement](#4.0)  
-    [4.1. Statement Properties](#4.1)  
-      [4.1.1. ID](#4.1.1)  
-      [4.1.2. Actor](#4.1.2)  
-      [4.1.3. Verb](#4.1.3)  
-      [4.1.4. Object](#4.1.4)  
-      [4.1.5. Result](#4.1.5)  
-      [4.1.6. Context](#4.1.6)  
-      [4.1.7. Timestamp](#4.1.7)  
-      [4.1.8. Stored](#4.1.8)  
-      [4.1.9. Authority](#4.1.9)  
-      [4.1.10. Voided](#4.1.10)  
-    [4.2. Retrieval of Statements](#4.2)  
-[5.0. Miscellaneous Types](#5.0)  
-    [5.1. Document](#5.1)  
-    [5.2. Language Map](#5.2)  
-    [5.3. Extensions](#5.3)  
-[6.0. Runtime Communication](#6.0)  
-    [6.1. Encoding](#6.1)  
-    [6.2. Version Header](#6.2)  
-    [6.3. Concurrency](#6.3)  
-    [6.4. Security](#6.4)  
-      [6.4.1. Authentication Definitions](#6.4.1)  
-      [6.4.2. OAuth Authorization Scope](#6.4.2)  
-[7.0. Data Transfer (REST)](#7.0)  
-    [7.1. Error Codes](#7.1)  
-    [7.2. Statement API](#7.2)  
-    [7.3. State API](#7.3)  
-    [7.4. Activity Profile API](#7.4)  
-    [7.5. Agent Profile API](#7.5)  
-    [7.6. Cross Origin Requests](#7.6)  
-    [7.7. Validation](#7.7)  
+[4.0. Statement](#statement)  
+    [4.1. Statement Properties](#stmtprops)  
+      [4.1.1. ID](#stmtid)  
+      [4.1.2. Actor](#actor)  
+      [4.1.3. Verb](#verb)  
+      [4.1.4. Object](#object)  
+      [4.1.5. Result](#result)  
+      [4.1.6. Context](#context)  
+      [4.1.7. Timestamp](#timestamp)  
+      [4.1.8. Stored](#stored)  
+      [4.1.9. Authority](#authority)  
+      [4.1.10. Voided](#voided)  
+    [4.2. Retrieval of Statements](#retstmts)  
+[5.0. Miscellaneous Types](#misctypes)  
+    [5.1. Document](#miscdocument)  
+    [5.2. Language Map](#misclangmap)  
+    [5.3. Extensions](#miscext)  
+[6.0. Runtime Communication](#rtcom)  
+    [6.1. Encoding](#encoding)  
+    [6.2. Version Header](#versionheader)  
+    [6.3. Concurrency](#concurrency)  
+    [6.4. Security](#security)  
+      [6.4.1. Authentication Definitions](#authdefs)  
+      [6.4.2. OAuth Authorization Scope](#oauthscope)  
+[7.0. Data Transfer (REST)](#datatransfer)  
+    [7.1. Error Codes](#errorcodes)  
+    [7.2. Statement API](#stmtapi)  
+    [7.3. State API](#stateapi)  
+    [7.4. Activity Profile API](#actprofapi)  
+    [7.5. Agent Profile API](#agentprofapi)  
+    [7.6. Cross Origin Requests](#cors)  
+    [7.7. Validation](#validation)  
 [Appendix A: Bookmarklet](#AppendixA)  
 [Appendix B: Creating an "IE Mode" Request](#AppendixB)  
 [Appendix C: Example definitions for activities of type "cmi.interaction"](#AppendixC)  
 
-<a name="1.0"/>  
+<a name="revhistory"/>  
 # 1.0 Revision History
 __0.8 (Project Tin Can API Deliverable) to 0.9 (March 31, 2012):__  
   
@@ -74,7 +74,7 @@ view.
 - Agent objects must now have exactly 1 uniquely identifying property, instead 
 of at least one.
 
-<a name="2.0"/>
+<a name="roleofxapi"/>
 # 2.0 Role of the Experience API  
 The Experience API is a service that allows for statements of experience 
 (typically learning experiences, but could be any experience) to be delivered 
@@ -99,7 +99,7 @@ are some examples of additional components that the Experience API is designing
 to work alongside. While the implementation details of these services are not 
 specified here, the Experience API is designed with these components in mind.  
  
-<a name="2.1"/>
+<a name="adlrole"/>
 ## 2.1 ADL's Role in the Experience API  
 ADL has taken a role of steward and facilitator in the development of the 
 Experience API.  The Experience API is seen as one piece of the ADL Training 
@@ -109,7 +109,7 @@ similar use cases, but can also support many of the use cases gathered by ADL
 and submitted by those involved in distributed learning which SCORM could not 
 enable.  
  
-<a name="2.2"/> 
+<a name="contributors"/> 
 ##2.2 Contributors
 My thanks to everyone who contributed to the Experience API project. Many of 
 you have called into the weekly meetings and helped to shape the specification 
@@ -127,7 +127,7 @@ Kristy S. Murray, Ed.D.
 Director, ADL Initiative  
 OSD, Training Readiness & Strategy (TRS)  
 
-<a name="2.2.1"/>
+<a name="wg"/>
 ## 2.2.1 Working Group Participants  
 <table>
 	<tr><th>Name:</th><th>Organization:</th></tr>
@@ -189,13 +189,13 @@ OSD, Training Readiness & Strategy (TRS)
 	<tr><td>Tom Creighton</td><td>ADL</td></tr>
 	<tr><td>Walt Grata</td><td>ADL</td></tr>
 </table> 
-<a name="2.2.2"/> 
+<a name="reqparticipants"/> 
 ## 2.2.2 Requirements Gathering Participants  
 In collection of requirements for the Experience API, there were many people and 
 organizations that provided invaluable feedback to SCORM, distributed learning 
 efforts, and learning in general.  User Voice Site, Rustici Blog, etc.  
 
-<a name="3.0"/> 
+<a name="defintions"/> 
 # 3.0 Definitions  
 
 __Experience API (XAPI)__: The API defined in this document, the product of 
@@ -258,12 +258,12 @@ the process of making one user or system "trusted" by another.
 __Community of Practice__: A group, usually connected by a common cause, role or 
 purpose, which operates in a common modality.
 
-<a name="4.0"/> 
+<a name="statement"/> 
 #4.0 Statement  
 The statement is the core of the XAPI.  All learning events are stored as statements 
 such as: "I did this".  
 
-<a name="4.1"/>
+<a name="stmtprops"/>
 ##4.1 Statement Properties:  
 Actor, verb, and object are required, all other properties are optional. Properties 
 can occur in any order, but are limited to one use each. Each property is discussed 
@@ -273,31 +273,32 @@ below.
 	<tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
 	<tr><td>id</td><td>UUID</td><td></td>
 	<td>UUID assigned by LRS or other trusted source.</td></tr>
-	<tr><td>actor</td><td>Object</td><td></td>
-	<td>Who the statement is about, as an Agent or Group object. 'I'</td></tr>
-	<tr><td>verb</td><td>Object</td><td></td>
+	<tr><td><a href="#actor">actor</a></td><td>Object</td><td></td>
+	<td>Who the statement is about, as an <a href="#agent">Agent</a> or 
+		<a href="#group">Group</a> object. 'I'</td></tr>
+	<tr><td><a href="#verb">verb</a></td><td>Object</td><td></td>
 	<td>Action of the Learner or Team object. "Did".</td></tr>
-	<tr><td>object</td><td>Object</td><td></td>
+	<tr><td><a href="#object">object</a></td><td>Object</td><td></td>
 	<td>Activity, agent, or another statement that is the object of the statement, 
 	"this". Note that objects which are provided as a value for this field should 
 	include a "objectType" field. If not specified, the object is assumed to be 
 	an activity.</td></tr>
-	<tr><td>result</td><td>Object</td><td></td>
+	<tr><td><a href="#result">result</a></td><td>Object</td><td></td>
 	<td>Result object, further details relevant to the specified verb.</td></tr>
-	<tr><td>context</td><td>Object</td><td></td>
+	<tr><td><a href="#context">context</a></td><td>Object</td><td></td>
 	<td>Context that gives the statement more meaning. Examples: Team actor is 
 	working with, altitude in a flight simulator.</td></tr>
-	<tr><td>timestamp</td><td>Date/Time</td><td></td>
+	<tr><td><a href="#timestamp">timestamp</a></td><td>Date/Time</td><td></td>
 	<td>Timestamp (Formatted according to <a href="https://en.wikipedia.org/wiki/ISO_8601#Durations">ISO 8601</a>) 
 	of when what this statement describes happened. If not provided, LRS 
 	should set this to the value of "stored" time.</td></tr>
-	<tr><td>stored</td><td>Date/Time</td><td></td>
+	<tr><td><a href="#stored">stored</a></td><td>Date/Time</td><td></td>
 	<td>Timestamp (Formatted according to <a href="https://en.wikipedia.org/wiki/ISO_8601#Durations">ISO 8601</a>) 
 	of when this statement was recorded. Set by LRS.</td></tr>
-	<tr><td>authority</td><td>Object</td><td></td>
+	<tr><td><a href="#authority">authority</a></td><td>Object</td><td></td>
 	<td>Agent who is asserting this statement is true. Verified by LRS based on 
 	authentication, and set by LRS if left blank.</td></tr>
-	<tr><td>voided</td><td>Boolean</td><td>false</td>
+	<tr><td><a href="#voided">voided</a></td><td>Boolean</td><td>false</td>
 	<td>Indicates that the statement has been voided (see below)</td></tr>
 </table>  
 Aside from (potential or required) assignments of properties during initial 
@@ -384,19 +385,20 @@ Typical simple completion with verb "attempted":
 	}
 }
 ```  
-<a name="4.1.1"/> 
+<a name="stmtid"/> 
 ### 4.1.1 ID:  
 
 The statement ID is a UUID which MAY be generated by the Learning Activity Provider. 
 If a statement is posted without an ID, the LRS MUST assign one.  
 
-<a name="4.1.2"/>
+<a name="actor"/>
 ### 4.1.2 Actor:  
 
 The actor field contains an Agent or Group object, loosely inspired by Friend 
 Of A Friend (FOAF, http://xmlns.com/foaf/spec/#term_Agent ), a widely accepted 
 vocabulary for describing identifiable individuals and groups.  
 
+<a name="agent"/>
 #### 4.1.2.1 Agent:  
 
 An Agent object is identified by an email address (or its hash), OpenID, or 
@@ -435,37 +437,110 @@ identifiers are marked with a *."
 			request is based on an mbox.</td>
 	</tr>
 	<tr><td>openid*</td><td>The URI of an openid that uniquely identifies this agent.</td></tr>
-	<tr><td>account*</td><td>An account object, see below.</td></tr>
+	<tr><td>account*</td><td>An account object, <a href="#agentaccount">see below</a>.</td></tr>
 </table>
- 
-<a name="4.1.3"/> 
-<a name="4.1.4"/> 
-<a name="4.1.5"/> 
-<a name="4.1.6"/> 
-<a name="4.1.7"/> 
-<a name="4.1.8"/> 
-<a name="4.1.9"/> 
-<a name="4.1.10"/> 
-<a name="4.2"/> 
-<a name="5.0"/> 
-<a name="5.1"/> 
-<a name="5.2"/> 
-<a name="5.3"/> 
-<a name="6.0"/> 
-<a name="6.1"/> 
-<a name="6.2"/> 
-<a name="6.3"/> 
-<a name="6.4"/> 
-<a name="6.4.1"/> 
-<a name="6.4.2"/> 
-<a name="7.0"/> 
-<a name="7.1"/> 
-<a name="7.2"/> 
-<a name="7.3"/> 
-<a name="7.4"/> 
-<a name="7.5"/> 
-<a name="7.6"/> 
-<a name="7.7"/> 
+
+<a name="agentaccount">
+__Account__  
+
+<table>
+	<tr><th>Property</th><th>Description</th></tr>
+	<tr>
+		<td>homePage</td>
+		<td>The URI to the canonical home page for the system the account is on. 
+			This is based on FOAF's accountServiceHomePage.</td>
+	</tr>
+	<tr>
+		<td>name</td>
+		<td>The unique ID or name used to log in to this account. This is based 
+			on FOAF's accountName.</td>
+	</tr>
+</table>  
+An example using an opaque account:  
+```
+{
+	"objectType": "Agent",
+	"account": {
+		"homePage": "http://www.example.com",
+		"name": "1625378"
+	}
+}
+```  
+Agents are also important in relation to OAuth. See the section on [OAuth](#authdefs) for details.  
+
+
+<a name="verb"/>
+###4.1.3 Verb:
+
+A verb defines what the action is between actors, activities, or most commonly, 
+between an actor and activity. The Tin Can API does not specify any particular 
+verbs, but rather defines how verbs are to be created. It is expected that verb 
+lists exist for various communities of practice. Verbs appear in statements as 
+objects consisting of a URI and a set of display names.
+
+The Verb URI should identify the particular semantics of a word, not the word 
+itself. For example, the English word "fired" could mean different things 
+depending on context, such as "fired a weapon", "fired a kiln", or "fired an 
+employee". In this case, a URI should identify one of these specific meanings, 
+not the word "fired".
+
+The Tin Can API does not specify any particular verbs (except the reserved 
+“http://adlnet.gov/expapi/verbs/voided"), but rather defines how verbs are to 
+be used. Communities of practice will develop verbs they find useful and make 
+them available to the general community for use.
+
+A verb in the Tin Can API is a URI, and denotes a specific meaning not tied to 
+any particular language. For example, a particular verb URI such as 
+http://example.org/firearms#fire or tag:example.com,2012:xQr73H might denote 
+the action of firing a gun, or the verb URI http://example.com/فعل/خواندن 
+might denote the action of reading a book. 
+
+The person who comes up with a new verb should own the URI, or have permission 
+from the owner to use the URI to denote a Tin Can API verb. The owner of a URI 
+SHOULD make a human-readable description of the intended usage of the verb 
+accessible at the URI.
+
+__NOTE__: In some future version, this specification might specify additional 
+machine-readable information about the verb be made available, but the choice 
+to do so is postponed to monitor emerging practices and pain points. ADL plans 
+to release a set of recommended verbs at the same time as this specification. 
+Learning Activity Providers MAY use one these verbs, or other verb which have 
+wide adoption, if applicable. The verb list to be created by ADL will include 
+verbs corresponding to the verbs previously defined in this specification. If 
+the meaning of one of those verbs is intended, Learning Activity Providers 
+SHOULD use the corresponding ADL verb. Learning Activity Providers MAY create 
+their own verbs instead, as needed. 
+<a name="object"/>
+<a name="activity"/>
+<a name="agentasobj"/>
+<a name="stmtasobj"/> 
+<a name="result"/>
+<a name="score"/> 
+<a name="context"/> 
+<a name="timestamp"/> 
+<a name="stored"/> 
+<a name="authority"/> 
+<a name="voided"/> 
+<a name="retstmts"/> 
+<a name="misctypes"/> 
+<a name="miscdocument"/> 
+<a name="misclangmap"/> 
+<a name="miscext"/> 
+<a name="rtcom"/> 
+<a name="encoding"/> 
+<a name="versionheader"/> 
+<a name="concurrency"/> 
+<a name="security"/> 
+<a name="authdefs"/> 
+<a name="oauthscope"/> 
+<a name="datatransfer"/> 
+<a name="errorcodes"/> 
+<a name="stmtapi"/> 
+<a name="stateapi"/> 
+<a name="actprofapi"/> 
+<a name="agentprofapi"/> 
+<a name="cors"/> 
+<a name="validation"/> 
 <a name="AppendixA"/> 
 <a name="AppendixB"/> 
 <a name="AppendixC"/>   
