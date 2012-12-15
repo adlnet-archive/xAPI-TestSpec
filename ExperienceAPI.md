@@ -440,7 +440,7 @@ identifiers are marked with a *."
 	<tr><td>account*</td><td>An account object, <a href="#agentaccount">see below</a>.</td></tr>
 </table>
 
-<a name="agentaccount">
+<a name="agentaccount"/>
 __Account__  
 
 <table>
@@ -466,11 +466,65 @@ An example using an opaque account:
 	}
 }
 ```  
-Agents are also important in relation to OAuth. See the section on [OAuth](#authdefs) for details.  
+Agents are also important in relation to OAuth. See the section on 
+[OAuth](#authdefs) for details.  
+
+<a name="group"/>
+#### 4.1.2.2 Group:
+Groups are similar to Agents, represent collections of Agents, and can be used 
+most places Agents can. Groups can either be anonymous or identified. Anonymous 
+Groups MUST include a member property listing constituent Agents. Systems 
+consuming Statements MUST consider all anonymous Groups distinct. Anonymous 
+Groups are useful for describing collections of people where no ready identifier 
+for the group is available, such as ad hoc teams.  
+
+Identified Groups MUST, like Agents, include exactly one inverse functional 
+identifier. Identified Groups MAY also include a member property listing 
+constituent Agents. Inverse functional identifiers used for identified Groups 
+SHOULD NOT be used for any Agents.  
+
+Systems consuming Statements MUST NOT assume member Agents comprise an exact 
+list of agents in an anonymous or identified Group.  
+
+__Anonymous Group__  
+<table>
+	<tr><th>Property</th><th>Description</th></tr>
+	<tr><td>objectType</td><td>"Group" (Required)</td></tr>
+	<tr><td>name</td><td>String (Optional)</td></tr>
+	<tr><td>member</td>
+		<td>(array of) <a href="#agent">Agent</a> (not Group) objects representing 
+			members of this Group.</td>
+	</tr>
+</table>
+
+__Identified Group__  
+<table>
+	<tr><th>Property</th><th>Description</th></tr>
+	<tr><td>objectType</td><td>"Group" (Required)</td></tr>
+	<tr><td>name</td><td>String (Optional)</td></tr>
+	<tr>
+		<td><a href="http://xmlns.com/foaf/spec/%22%20%5Cl%20%22term_mbox">mbox*</a></td>
+		<td>String in the form "mailto:email address". (Note: Only emails that 
+			have only ever been and will ever be assigned to this Agent, 
+			but no others, should be used for this property and mbox_sha1sum).</td>
+	</tr>
+	<tr>
+		<td><a href="http://xmlns.com/foaf/spec/%22%20%5Cl%20%22term_mbox_sha1sum">mbox_sha1sum*</a></td>
+		<td>String containing the SHA1 hash of a mailto URI (such as goes in an mbox 
+			property). An LRS MAY include Agents with a matching hash when a 
+			request is based on an mbox.</td>
+	</tr>
+	<tr><td>openid*</td><td>The URI of an openid that uniquely identifies this agent.</td></tr>
+	<tr><td>account*</td><td>An account object, <a href="#agentaccount">see below</a>.</td></tr>
+	<tr><td>member</td>
+		<td>(array of) <a href="#agent">Agent</a> (not Group) objects representing 
+			members of this Group.</td>
+	</tr>
+</table>  
 
 
 <a name="verb"/>
-###4.1.3 Verb:
+### 4.1.3 Verb:
 
 A verb defines what the action is between actors, activities, or most commonly, 
 between an actor and activity. The Tin Can API does not specify any particular 
@@ -509,7 +563,42 @@ wide adoption, if applicable. The verb list to be created by ADL will include
 verbs corresponding to the verbs previously defined in this specification. If 
 the meaning of one of those verbs is intended, Learning Activity Providers 
 SHOULD use the corresponding ADL verb. Learning Activity Providers MAY create 
-their own verbs instead, as needed. 
+their own verbs instead, as needed.  
+
+#### 4.1.3.1 Verb Object: 
+
+The verb object is the representation of a verb that is actually included in 
+a statement. In addition to referencing the verb itself via a URI, it includes 
+a display property which provides the human-readable meaning of the verb in 
+one or more languages.
+
+The display property MUST NOT be used to alter the meaning of a statement, 
+rather it MUST be used to illustrate the meaning which is already determined 
+by the verb URI.
+
+All statements SHOULD use the display property.  A system reading a statement 
+MUST NOT use the display property to infer any meaning from the statement, 
+rather it MUST use the verb URI to infer meaning, and the display property only 
+for display to a human.  
+<table>
+	<tr><th>Property</th><th>Description</th><th>Example</th></tr>
+	<tr>
+		<td>id</td>
+		<td>A URI that corresponds to a verb definition. Each verb definition 
+			corresponds to the meaning of a verb, not the word. A URI should 
+			be human-readable and contain the verb meaning.</td>
+		<td>www.adlnet.gov/XAPIprofile/ran(travelled_a_distance)</td>
+	</tr>
+	<tr>
+		<td>display</td>
+		<td>A language map containing the human readable representation of the 
+			verb in at least one language. This does not have any impact on the 
+			meaning of the statement, but only serves to give a human-readable 
+			display of the meaning already determined by the chosen verb.</td>
+		<td>display : { "en-US" : "ran"}<br/>
+			display : { "en-US" : "ran", "es" : "corrió" }</td>
+	</tr>
+</table>
 <a name="object"/>
 <a name="activity"/>
 <a name="agentasobj"/>
