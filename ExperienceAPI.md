@@ -53,7 +53,7 @@
 
 <a name="1.0"/>  
 # 1.0 Revision History
-__0.8 (Project Tin Can API Deliverable) to 0.9 (March 31, 2012):__
+__0.8 (Project Tin Can API Deliverable) to 0.9 (March 31, 2012):__  
   
 Rustici software, whom delivered Project Tin Can API, made modifications to the 
 API prior to the April 2012 Kickoff Meeting. It was voted in this meeting to 
@@ -288,11 +288,11 @@ below.
 	<td>Context that gives the statement more meaning. Examples: Team actor is 
 	working with, altitude in a flight simulator.</td></tr>
 	<tr><td>timestamp</td><td>Date/Time</td><td></td>
-	<td>Timestamp (Formatted according to [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601#Durations)) 
+	<td>Timestamp (Formatted according to [ISO 8601][]) 
 	of when what this statement describes happened. If not provided, LRS 
 	should set this to the value of "stored" time.</td></tr>
 	<tr><td>stored</td><td>Date/Time</td><td></td>
-	<td>Timestamp (Formatted according to [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601#Durations)) 
+	<td>Timestamp (Formatted according to [ISO 8601][]) 
 	of when this statement was recorded. Set by LRS.</td></tr>
 	<tr><td>authority</td><td>Object</td><td></td>
 	<td>Agent who is asserting this statement is true. Verified by LRS based on 
@@ -447,3 +447,5 @@ identifiers are marked with a *."
 <a name="AppendixA"/> 
 <a name="AppendixB"/> 
 <a name="AppendixC"/>   
+
+[iso 8601]: https://en.wikipedia.org/wiki/ISO_8601#Durations	"ISO 8601"
