@@ -288,12 +288,12 @@ below.
 	<td>Context that gives the statement more meaning. Examples: Team actor is 
 	working with, altitude in a flight simulator.</td></tr>
 	<tr><td>timestamp</td><td>Date/Time</td><td></td>
-	<td>Timestamp of when what this statement describes happened. 
-	If not provided, LRS should set this to the value of "stored" time.  
-	Formatted according to [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601#Durations)</td></tr>
+	<td>Timestamp (Formatted according to <a href="https://en.wikipedia.org/wiki/ISO_8601#Durations">ISO 8601</a>) 
+	of when what this statement describes happened. If not provided, LRS 
+	should set this to the value of "stored" time.</td></tr>
 	<tr><td>stored</td><td>Date/Time</td><td></td>
-	<td>Timestamp of when this statement was recorded. Set by LRS.  
-	Formatted according to [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601#Durations)</td></tr>
+	<td>Timestamp (Formatted according to <a href="https://en.wikipedia.org/wiki/ISO_8601#Durations">ISO 8601</a>) 
+	of when this statement was recorded. Set by LRS.</td></tr>
 	<tr><td>authority</td><td>Object</td><td></td>
 	<td>Agent who is asserting this statement is true. Verified by LRS based on 
 	authentication, and set by LRS if left blank.</td></tr>
