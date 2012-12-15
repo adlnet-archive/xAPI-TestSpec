@@ -202,9 +202,11 @@ __Experience API (XAPI)__: The API defined in this document, the product of
 "Project Tin Can API". A simple, lightweight way for any permitted actor to store 
 and retrieve extensible learning records, learner and learning experience profiles, 
 regardless of the platform used.  
+
 <a name="tcapi"/>
 __Tin Can API (TCAPI)__: The previous name of the API defined in this document.  
-__Learning Activity Provider (AP): The software object that is communicating with 
+
+__Learning Activity Provider (AP)__: The software object that is communicating with 
 the LRS to record information about a learning experience. May be similar to a SCORM 
 package as it is possible to bundle assets with the software object that does this 
 communication, but may also be separate from the experience it is reporting about.
