@@ -1654,7 +1654,7 @@ Returns: 200 OK, Array of IDs
 	</tr>
 </table>
 
-## DELETE http://example.com/XAPI/activities/state
+### DELETE http://example.com/XAPI/activities/state
 Deletes all state data for this context (activity + agent \[+ registration if 
 specified\]).  
 
@@ -1672,6 +1672,59 @@ Returns: 204 No Content
 	</tr>
 </table>
 <a name="actprofapi"/> 
+## 7.4 Activity Profile API:
+The Activity Profile API is much like the State API, allowing for arbitrary key 
+/ document pairs to be saved which are related to an Activity. When using the 
+profile API for manipulating documents, be aware of how the profileId parameter
+ affects the semantics of the call. If it is included, the GET and DELETE methods 
+will act upon a single defined document identified by "profileId". Otherwise, 
+GET will return the available IDs, and DELETE will delete all state in the 
+context given through the other parameters.  
+
+The Activity Profile API also includes a method to retrieve a full description 
+of an activity from the LRS.  
+
+### GET http://example.com/XAPI/activities
+Loads the complete activity object specified.  
+
+Returns: 200 OK - Content  
+<table>
+	<tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+	<tr><td>activityId</td><td>String</td><td>yes</td>
+		<td>The ID associated with the activities to load.</td>
+	</td>
+</table>
+
+### PUT | GET | DELETE http://example.com/XAPI/activities/profile
+Saves/retrieves/deletes the specified profile document in the context of the 
+specified activity.  
+
+Returns: (PUT | DELETE) 204 No Content, (GET) 200 OK - Profile Content  
+<table>
+	<tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+	<tr><td>activityId</td><td>String</td><td>yes</td>
+		<td>The activity ID associated with this profile.</td>
+	</tr>
+	<tr><td>profileId</td><td>String</td><td>yes</td>
+		<td>The profile ID associated with this profile.</td>
+	</tr>
+</table>
+
+### GET http://example.com/XAPI/activities/profile
+Loads IDs of all profile entries for an activity. If "since" parameter is 
+specified, this is limited to entries that have been stored or updated since 
+the specified timestamp (exclusive).  
+
+Returns: 200 OK - List of IDs  
+<table>
+	<tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th><tr>
+	<tr><td>activityId</td><td>String</td><td>yes</td>
+		<td>The activity ID associated with these profiles.</td>
+	</tr>
+	<tr><td>since</td><td>Timestamp</td><td>no</td>
+		<td>Only IDs of profiles stored since the specified timestamp (exclusive) are returned.</td>
+	</tr>
+</table>
 <a name="agentprofapi"/> 
 <a name="cors"/> 
 <a name="validation"/> 
