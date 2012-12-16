@@ -600,7 +600,160 @@ for display to a human.
 	</tr>
 </table>
 <a name="object"/>
+### 4.1.4 Object:  
+The object of a statement is the Activity, Agent, or Statement that is the object 
+of the statement, "this". Note that objects which are provided as a value for 
+this field should include an "objectType" field. If not specified, the object 
+is assumed to be an Activity.  
+
 <a name="activity"/>
+#### 4.1.4.1 – Activity as “object”
+A statement may represent a Learning Activity as an object in the statement.  
+<table>
+	<tr><th>Property</th><th>Description</th></tr>
+	<tr>
+		<td>objectType</td>
+		<td>Should always be "Activity" when present. Used in cases where type 
+			cannot otherwise be determined, such as the value of a statement's 
+			"object" field.</td>
+	</tr>
+	<tr><td><a href="#acturi">id</a></td><td>URI. If a URL, the URL should refer to metadata for this activity.</td></tr>
+	<tr><td><a href="#actdef">definition</a></td><td>Metadata, See below</td></tr>
+</table>
+<a name="acturi"/>
+__Activity URI__  
+An activity URI must always refer to a single unique activity. There may be 
+corrections to that activity's definition. Spelling fixes would be appropriate, 
+for example, but changing correct responses would not.  
+
+The activity URI is unique, and any reference to it always refers to the same 
+activity. Activity Providers must ensure this is true and the LRS may not attempt 
+to treat multiple references to the same URI as references to different activities, 
+regardless of any information which indicates two authors or organizations may 
+have used the same activity URI.    
+
+When defining an activity URI, care must be taken to make sure it will not be 
+re-used. It should use a domain the creator controls or has been authorized to 
+use for this purpose, according to a scheme the domain owner has adopted to make 
+sure activity URIs within that domain remain unique.  
+
+Any state or statements stored against an activity URI must be compatible and 
+consistent with any other state or statements that are stored against the same 
+activity URI, even if those statements were stored in the context of a new 
+revision or platform.   
+
+NOTE: The prohibition against an LRS treating references to the same activity 
+URI as two different activities, even if the LRS can positively determine that 
+was the intent, is crucial to prevent activity id creators from creating ids 
+that could be easily duplicated, as intent would be indeterminable should a 
+conflict with another system arise.  
+
+<a name="actdef"/>
+__Activity Definition__  
+<table>
+	<tr><th>Property</th><th>Description</th></tr>
+	<tr><td>name</td><td><a href="#misclangmap">Language Map</a>, The human readable/visual name of the activity</td></tr>
+	<tr><td>description</td><td><a href="misclangmap">Language Map</a>, A description of the activity</td></tr>
+	<tr>
+		<td>type</td>
+		<td>URI, the type of activity. Note, URI fragments (sometimes called 
+			relative URLs) are not valid URIs. Similar to verbs, we recommend 
+			that Learning Activity Providers look for and use established, 
+			widely adopted, activity types.</td>
+	</tr>
+	<tr>
+		<td>interactionType | correctResponsesPattern | choices | scale | 
+			source | target | steps</td>
+		<td><a href="#interactionacts">See "Interaction Activities"</a></td>
+	</tr>
+	<tr><td>extensions</td><td>A map of other properties as needed (see: <a href="#miscext">Extensions</a>)</td></tr>
+</table>  
+An LRS should update its internal representation of an activity's definition 
+upon receiving a statement with a different definition of the activity from the 
+one stored, but only if it considers the Learning Activity Provider to have the 
+authority to do so.  
+
+Activities may be defined in XML according to the schema http://www.adlnet.gov/xapi. 
+LRS's MAY attempt to look up an XML document at the URL given by the activity URI, 
+and check if it conforms to the Experience API schema. If it does, the LRS SHOULD 
+fill in its internal representation of the activities definition based on that 
+document. Note that activity URI's are not required to resolve to such metadata.  
+
+Note that multiple activities may be defined in the same metadata document. The 
+LRS MAY choose whether to store information about activities other than those 
+it has received statements for or not.  
+
+As part of each group of activities, the activity metadata document may define 
+information about an associated activity provider, which the LRS SHOULD consider 
+the authoritative source for statements about the activity.  
+
+<a name="interactionacts"/>
+__Interaction Activities__  
+
+Traditional e-learning has included structures for interactions or assessments. 
+As a way to allow these practices and structures to extend Experience API's 
+utility, this specification include built in definitions for interactions which 
+borrows from the CMI data model. These definitions are intended to provide a 
+simple and familiar utility for recording interaction data. These definitions 
+are simple to use, and consequently limited. It is expected that communities of 
+practice requiring richer interactions definitions will do so through the use 
+of extensions to an activity's type and definition.  
+
+When defining interaction activities, the activity type: 
+"http://www.adlnet.gov/experienceapi/activity-types/cmi.interaction" SHOULD 
+be used, and a valid interactionType MUST be specified. If interactionType 
+is specified, an LRS processing MAY validate the remaining properties as 
+specified in the table below, and return HTTP 400 "Bad Request" if the 
+remaining properties are not valid for the interaction type.  
+<table>
+	<tr><th>Property</th><th>Description</th></tr>
+	<tr>
+		<td>interactionType</td>
+		<td>As in "cmi.interactions.n.type" as defined in the SCORM 2004 4th 
+			edition Runtime Environment.</td>
+	</tr>
+	<tr>
+		<td>correctResponsesPattern</td>
+		<td>An array of strings, corresponding to 
+			"cmi.interactions.n.correct_responses.n.pattern" as defined in 
+			the SCORM 2004 4th edition Runtime Environment, where the final 
+			_n_ is the index of the array.</td>
+	</tr>
+	<tr>
+		<td>choices | scale | source | target | steps</td>
+		<td>Array of interaction components specific to the given interaction type (see below).</td>
+	</tr>
+</table>  
+
+__Interaction Components__  
+
+Interaction components are defined as follows:  
+<table>
+	<tr><th>Property</th><th>Description</th></tr>
+	<tr>
+		<td>id</td>
+		<td>As in "cmi.interactions.n.id" as defined in the SCORM 2004 4th 
+			edition Runtime Environment</td> 
+	<tr>
+		<td>description</td> 
+		<td><a href="misclangmap">Language Map</a>, a description of the interaction component 
+			(for example, the text for a given choice in a multiple-choice interaction)</td>
+	</tr>
+</table>  
+
+The following table shows the supported lists of CMI interaction components for 
+an interaction activity with the given interactionType.  
+<table>
+	<tr><th>interactionType</th><th>supported component list(s)</th><tr>
+	<tr><td>choice, sequencing</td><td>choices</td></tr>
+	<tr><td>likert</td><td>scale</td></tr>
+	<tr><td>matching</td><td>source, target</td></tr>
+	<tr><td>performance</td><td>steps</td></tr>
+	<tr><td>true-false, fill-in, numeric, other</td><td>[No component lists defined]</td></tr>
+</table>
+
+>See [Appendix C](#AppendixC) for examples of activity definitions for each of the cmi.interaction types.
+
 <a name="agentasobj"/>
 <a name="stmtasobj"/> 
 <a name="result"/>
