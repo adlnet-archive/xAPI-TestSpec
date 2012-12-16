@@ -1443,15 +1443,165 @@ The list below offers some general guidance on HTTP error codes that may
 be returned from various methods in the API. An LRS MUST return an error 
 code appropriate to the error condition, and SHOULD return a message in the 
 response explaining the cause of the error.  
-- 400 Bad Request - MAY be returned by any method of the API, and indicates an error condition caused by an invalid or missing argument. The term "invalid arguments" includes malformed JSON or invalid object structures.
-- 401 Unauthorized - Indicates that authentication is required, or in the case authentication has been posted in the request, that the given credentials have been refused.
-- 403 Forbidden - Indicates that the request is unauthorized for the given credentials. Note this is different than refusing the credentials given. In this case, the credentials have been validated, but the authenticated client is not allowed to perform the given action.
-- 404 Not Found - Indicates the requested resource was not found. May be returned by any method that returns a uniquely identified resource, for instance, any state or profile API call targeting a specific document, or the method to retrieve a single statement.
-- 409 Conflict - Indicates an error condition due to a conflict with the current state of a resource, in the case of state and profile API calls, or in the statement PUT call. See section 6.3 for more details.
-- 412 Precondition Failed - Indicates an error condition due to a failure of a precondition posted with the request, in the case of state and profile API calls. See section 6.3 for more details.
-- 500 Internal Server Error - General error condition, typically indicating an unexpected exception in processing on the server.
+- 400 Bad Request - MAY be returned by any method of the API, and indicates 
+an error condition caused by an invalid or missing argument. The term 
+"invalid arguments" includes malformed JSON or invalid object structures.
+- 401 Unauthorized - Indicates that authentication is required, or in the 
+case authentication has been posted in the request, that the given credentials 
+have been refused.
+- 403 Forbidden - Indicates that the request is unauthorized for the given 
+credentials. Note this is different than refusing the credentials given. In 
+this case, the credentials have been validated, but the authenticated client 
+is not allowed to perform the given action.
+- 404 Not Found - Indicates the requested resource was not found. May be 
+returned by any method that returns a uniquely identified resource, for 
+instance, any state or profile API call targeting a specific document, or 
+the method to retrieve a single statement.
+- 409 Conflict - Indicates an error condition due to a conflict with the 
+current state of a resource, in the case of state and profile API calls, or 
+in the statement PUT call. See section 6.3 for more details.
+- 412 Precondition Failed - Indicates an error condition due to a failure of 
+a precondition posted with the request, in the case of state and profile API 
+calls. See section 6.3 for more details.
+- 500 Internal Server Error - General error condition, typically indicating an 
+unexpected exception in processing on the server.
 
 <a name="stmtapi"/> 
+# 7.2 Statement API:
+The basic communication mechanism of the Experience API.  
+
+## PUT http://example.com/XAPI/statements
+
+Stores statement with the given ID. This MUST NOT modify an existing statement. 
+If the statement ID already exists, the receiving system SHOULD verify the 
+received statement matches the existing one and return 409 Conflict if they 
+do not match.  
+
+An LRS MUST NOT make any modifications to its state based on a receiving a statement 
+with a statementID that it already has a statement for. Whether it responds with 
+"409 Conflict", or "204 No Content", it MUST NOT modify the statement or any other 
+object.  
+
+Returns: 204 No Content  
+<table>
+	<tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr>
+	<tr><td>statementId</td><td>String</td><td> </td><td>ID of statement to record</td></tr>
+</table>
+
+## POST http://example.com/XAPI/statements
+
+Stores a statement, or a set of statements. Since the PUT method targets a specific 
+statement ID, POST must be used rather than PUT to save multiple statements, or to 
+save one statement without first generating a statement ID. An alternative for systems 
+that generate a large amount of statements is to provide the LRS side of the API 
+on the AP, and have the LRS query that API for the list of updated (or new) 
+statements periodically. This will likely only be a realistic option for systems 
+that provide a lot of data to the LRS.  
+
+Returns: 200 OK, statement ID(s) (UUID).  
+
+## GET http://example.com/XAPI/statements
+
+This method may be called to fetch a single statement, if the statementId 
+parameter is specified, or a list of statements otherwise, filtered by the 
+given query parameters.  
+
+Returns: 200 OK, statement  
+<table>
+	<tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr>
+	<tr><td>statementId</td><td>String</td><td> </td><td>ID of statement to fetch</td></tr>
+</table>
+
+If statementId not specified, returns: A [StatementResult](#retstmts) object, 
+a list of statements in reverse chronological order based on "stored" time, 
+subject to permissions and maximum list length. If additional results are 
+available, a URL to retrieve them will be included in the StatementResult 
+object.  
+
+Returns: 200 OK, [Statement Result](#retstmts) (See section 4.2 for details)  
+
+<table>
+	<tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr>
+	<tr><td>verb</td><td>String</td><td> </td><td>Filter, only return statements matching the specified verb.</td></tr>
+	<tr><td>object</td><td>Activity, Agent, or Statement Object (JSON)</td><td> </td>
+		<td>Filter, only return statements matching the specified object 
+			(activity or actor).<br/><br/>
+			
+			Object is an activity: return statements with an object that is an 
+			activity with a matching activity ID to the specified activity.<br/><br/>
+			
+			Object is an actor: same behavior as "actor" filter, except match 
+			against object property of statements.
+		</td>
+	</tr>
+	<tr><td>registration</td><td>UUID</td><td> </td>
+		<td>Filter, only return statements matching the specified registration 
+			ID. Note that although frequently a unique registration ID will be used 
+			for one actor assigned to one activity, this should not be assumed. 
+			If only statements for a certain actor or activity should be returned, 
+			those parameters should also be specified.
+		</td>
+	</tr>
+	<tr><td>context</td><td>Boolean</td><td>True</td>
+		<td>When filtering on activities (object), include statements for which 
+			any of the context activities match the specified object.
+		</td>
+	</tr>
+	<tr><td>actor</td><td>Actor Object (JSON)</td><td> </td>
+		<td>Filter, only return statements about the specified agent. 
+			Note: at minimum agent objects where every property is 
+			identical are considered identical. Additionaly, if the 
+			LRS can determine that two actor objects refer to the same 
+			agent, they should be treated as identical for filtering 
+			purposes. See <a href="#agent">agent</a> object definition 
+			for details.
+		</td>
+	</tr>
+	<tr><td>since</td><td>Timestamp</td><td> </td>
+		<td>Only statements stored since the specified timestamp (exclusive) are returned.</td>
+	</tr>
+	<tr><td>until</td><td>Timestamp</td><td> </td>
+		<td>Only statements stored at or before the specified timestamp are returned.</td>
+	</tr>
+	<tr><td>limit</td><td>Nonnegative Integer</td><td>0</td>
+		<td>Maximum number of statements to return. 0 indicates return the 
+			maximum the server will allow.</td>
+	</tr>
+	<tr><td>authoritative</td><td>Boolean</td><td>True</td>
+		<td>Only include statements that are asserted by actors authorized to 
+			make this assertion (according to the LRS), and are not superseded 
+			by later statements.</td>
+	</tr>
+	<tr><td>sparse</td><td>Boolean</td><td>True</td>
+		<td>If true, only include minimum information necessary in actor and 
+			activity objects to identify them, If false, return populated 
+			activity and actor objects.<br/><br/>
+
+			Activity objects contain Language Map objects for name and 
+			description. Only one language should be returned in each of 
+			these maps.<br/><br/>
+
+			In order to provide these strings in the most relevant language, 
+			the LRS will apply the Accept-Language header as described in 
+			<a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html">
+			RFC 2616</a> (HTTP 1.1), except that this logic will 
+			be applied to each language map individually to select which 
+			language entry to include, rather than to the resource (list of 
+			statements) as a whole.
+		</td>
+	</tr>
+	<tr><td>instructor</td><td>Actor Object (JSON)</td><td> </td>
+		<td>Same behavior as "actor" filter, except match against 
+			"context:instructor".</td>
+	</tr>
+	<tr><td>ascending</td><td>Boolean</td><td>False</td>
+		<td>If true, return results in ascending order of stored time</td>
+	</tr>
+<table>
+__Note__: Due to query string limits, this method may be called using POST and 
+form fields if necessary. The LRS will differentiate a POST to add a statement 
+or to list statements based on the parameters passed.  
+
 <a name="stateapi"/> 
 <a name="actprofapi"/> 
 <a name="agentprofapi"/> 
