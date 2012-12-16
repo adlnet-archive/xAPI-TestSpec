@@ -1522,14 +1522,14 @@ Returns: 200 OK, [Statement Result](#retstmts) (See section 4.2 for details)
 
 <table>
 	<tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr>
-	<tr><td>verb</td><td>String</td><td> </td><td>Filter, only return statements matching the specified verb.</td></tr>
+	<tr><td>verb</td><td>String</td><td> </td>
+		<td>Filter, only return statements matching the specified verb.</td>
+	</tr>
 	<tr><td>object</td><td>Activity, Agent, or Statement Object (JSON)</td><td> </td>
 		<td>Filter, only return statements matching the specified object 
 			(activity or actor).<br/><br/>
-			
 			Object is an activity: return statements with an object that is an 
 			activity with a matching activity ID to the specified activity.<br/><br/>
-			
 			Object is an actor: same behavior as "actor" filter, except match 
 			against object property of statements.
 		</td>
@@ -1576,11 +1576,9 @@ Returns: 200 OK, [Statement Result](#retstmts) (See section 4.2 for details)
 		<td>If true, only include minimum information necessary in actor and 
 			activity objects to identify them, If false, return populated 
 			activity and actor objects.<br/><br/>
-
 			Activity objects contain Language Map objects for name and 
 			description. Only one language should be returned in each of 
 			these maps.<br/><br/>
-
 			In order to provide these strings in the most relevant language, 
 			the LRS will apply the Accept-Language header as described in 
 			<a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html">
