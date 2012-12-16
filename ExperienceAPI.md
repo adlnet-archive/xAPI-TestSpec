@@ -643,7 +643,7 @@ consistent with any other state or statements that are stored against the same
 activity URI, even if those statements were stored in the context of a new 
 revision or platform.   
 
-NOTE: The prohibition against an LRS treating references to the same activity 
+__NOTE__: The prohibition against an LRS treating references to the same activity 
 URI as two different activities, even if the LRS can positively determine that 
 was the intent, is crucial to prevent activity id creators from creating ids 
 that could be easily duplicated, as intent would be indeterminable should a 
@@ -1099,10 +1099,84 @@ querying services create metadata from Experience API statements and other
 available data.  
 
 <a name="retstmts"/> 
+## 4.2 Retrieval of Statements:
+A collection of statements can be retrieved by performing a query on the "statements" 
+endpoint, see section [7.2 "Statement API"](#stmtapi) for details.  
+<table>
+	<tr><th>Property</th><th>Type</th><th>Description</th></tr>
+	<tr><td>statements</td><td>Array of Statements</td>
+		<td>List of statements. If the list returned has been limited (due to pagination), 
+			and there are more results, they will be located at the "statements" property 
+			within the container located at the URL provided by the "more" element of 
+			this statement result object.
+		</td>
+	</tr>
+	<tr><td>more</td><td>URL</td>
+		<td>Relative URL that may be used to fetch more results, including the full path 
+			and optionally a query string but excluding scheme, host, and port. 
+			Empty string if there are no more results to fetch.<br/><br/>
+
+			This URL must be usable for at least 24 hours after it is returned by the LRS. 
+			In order to avoid the need to store these URLs and associated query data, an 
+			LRS may include all necessary information within the URL to continue the 
+			query, but should avoid generating extremely long URLs. The consumer should 
+			not attempt to interpret any meaning from the URL returned.
+		</td>
+	</tr>
+</table>
+
 <a name="misctypes"/> 
+# 5.0 Miscellaneous Types
 <a name="miscdocument"/> 
-<a name="misclangmap"/> 
+## 5.1 Document:
+The Experience API provides a facility for Activity Providers to save arbitrary data in 
+the form of documents, which may be related to an Activity, Agent, or combination of both.  
+<table>
+	<tr><th>Property</th><th>Description</th></tr>
+	<tr><td>id</td><td>String, set by AP, unique within state scope (learner, activity)</td></tr>
+	<tr><td>updated</td><td>Timestamp</td></tr>
+	<tr><td>contents</td><td>Free form.</td></tr>
+</table>
+Note that in the REST binding, State is a document not an object. ID is stored in the URL, 
+updated is HTTP header information, and contents is the HTTP document itself.  
+
+<a name="misclangmap"/>
+## 5.2 Language Map
+A language map is a dictionary where the key is a 
+[RFC 5646 Language Tag](http://tools.ietf.org/html/rfc5646), and the value is a 
+string in the language specified in the tag. This map should be populated as 
+fully as possible based on the knowledge of the string in question in different 
+languages.  
+
 <a name="miscext"/> 
+## 5.3 Extensions
+Extensions are defined by a map. The keys of that map MUST be URIs, and the 
+values MAY be any JSON value or data structure. The meaning and structure of 
+extension values under a URI key are defined by the person who coined the URI, 
+who SHOULD be the owner of the URI, or have permission from the owner. The owner 
+of the URI SHOULD make a human-readable description of the intended meaning of 
+the extension supported by the URI accessible at the URI. A learning record store 
+MUST NOT reject a Experience API statement based on the values of the extensions 
+map.  
+
+Extensions are available as part of activity definitions, as part of statement 
+context, or as part of some statement result. In each case, they’re intended to 
+provide a natural way to extend those elements for some specialized use. The 
+contents of these extensions might be something valuable to just one application, 
+or it might be a convention used by an entire community of practice.  
+
+Extensions should logically relate to the part of the statement where they are 
+present. Extensions in statement context should provide context to the core 
+experience, while those in the result should provide elements related to some 
+outcome. For activities, they should provide additional information that helps 
+define an activity within some custom application or community.  
+
+__Note__: A statement should not be totally defined by its extensions, and be 
+meaningless otherwise. Experience API statements should be capturing experiences 
+among actors and objects, and should always strive to map as much information as 
+possible into the built in elements, in order to leverage interoperability among 
+Experience API conformant tools.  
+
 <a name="rtcom"/> 
 <a name="encoding"/> 
 <a name="versionheader"/> 
