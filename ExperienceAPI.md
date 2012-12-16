@@ -1725,7 +1725,97 @@ Returns: 200 OK - List of IDs
 		<td>Only IDs of profiles stored since the specified timestamp (exclusive) are returned.</td>
 	</tr>
 </table>
+
 <a name="agentprofapi"/> 
+## 7.5 Agent Profile API:
+The Agent Profile API is much like the State API, allowing for arbitrary key / 
+document pairs to be saved which are related to an Agent. When using the 
+profile API for manipulating documents, be aware of how the profileId parameter 
+affects the semantics of the call. If it is included, the GET and DELETE 
+methods will act upon a single defined document identified by "profileId". 
+Otherwise, GET will return the available IDs, and DELETE will delete all state 
+in the context given through the other parameters.  
+
+The Agent Profile API also includes a method to retrieve a special object with 
+combined information about an Agent derived from an outside service, such as a 
+directory service.  
+
+### GET http://example.com/XAPI/agents
+Return a special, Person object for a specified agent. The Person object is 
+very similar to an Agent object, but instead of each attribute having a single 
+value, each attribute has an array value, and it is legal to include multiple 
+identifying properties. Note that the argument is still a normal Agent object 
+with a single identifier and no arrays. Note that this is different from the 
+FOAF concept of person, person is being used here to indicate a person-centric 
+view of the LRS agent data, but agents just refer to one persona (a person in 
+one context).  
+
+An LRS capable of returning multiple identifying properties for an Person SHOULD 
+require the connecting credentials have increased, explicitly given permissions. 
+An LRS SHOULD reject insufficiently privileged requests with 403 "Forbidden". 
+If an LRS does not have any additional information about an Agent to return, the 
+LRS MUST still return an Person when queried, but that Person object will only 
+include the information associated with the requested Agent.  
+
+Person properties. All array properties must be populated with members with the 
+same definition as the similarly named property from Agent objects.  
+
+<table>
+	<tr><th>Property</th><th>Description</th></tr>
+	<tr><td>objectType</td><td>Person. Required.</td></tr>
+	<tr><td>name</td><td>Array of strings. Optional.</td></tr>
+	<tr><td><a href="http://xmlns.com/foaf/spec/%22%20%5Cl%20%22term_mbox">mbox*</a>
+		</td><td>Array of strings.</td>
+	</tr>
+	<tr><td><a href="http://xmlns.com/foaf/spec/%22%20%5Cl%20%22term_mbox_sha1sum">mbox_sha1sum*</a></td>
+		<td>Array of strings.</td>
+	</tr>
+	<tr><td>openid*</td><td>Array of strings.</td></tr>
+	<tr><td>account*</td><td>Array of account objects.</td></tr>
+</table>  
+
+Returns: 200 OK - Expanded Agent Object  
+
+<table>
+	<tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+	<tr><td>agent</td><td>Object (JSON)</td><td>yes</td>
+		<td>The agent representation to use in fetching expanded agent information.</td>
+	</tr>
+</table>  
+
+### PUT | GET | DELETE http://example.com/XAPI/agents/profile
+Saves/retrieves/deletes the specified profile document in the context of the 
+specified agent.  
+
+Returns: (PUT | DELETE) 204 No Content, (GET) 200 OK - Profile Content  
+
+<table>
+	<tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+	<tr><td>agent</td><td>Object (JSON)</td><td>yes</td>
+		<td>The agent associated with this profile.</td>
+	</tr>
+	<tr><td>profileId</td><td>String</td><td>yes</td>
+		<td>The profile ID associated with this profile.</td>
+	</tr>
+</table>  
+
+### GET http://example.com/XAPI/agents/profile
+Loads IDs of all profile entries for an agent. If "since" parameter is specified, 
+this is limited to entries that have been stored or updated since the specified 
+timestamp (exclusive).  
+
+Returns: 200 OK - List of IDs  
+<table>
+	<tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+	<tr><td>agent</td><td>Object (JSON)</td><td>yes</td>
+		<td>The agent associated with this profile.</td>
+	</tr>
+	<tr><td>since</td><td>Timestamp</td><td>no</td>
+		<td>Only IDs of profiles stored since the specified timestamp 
+			(exclusive) are returned</td>
+	</tr>
+</table>  
+
 <a name="cors"/> 
 <a name="validation"/> 
 <a name="AppendixA"/> 
