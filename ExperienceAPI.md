@@ -1595,7 +1595,7 @@ Returns: 200 OK, [Statement Result](#retstmts) (See section 4.2 for details)
 	<tr><td>ascending</td><td>Boolean</td><td>False</td>
 		<td>If true, return results in ascending order of stored time</td>
 	</tr>
-<table>
+</table>
 __Note__: Due to query string limits, this method may be called using POST and 
 form fields if necessary. The LRS will differentiate a POST to add a statement 
 or to list statements based on the parameters passed.  
