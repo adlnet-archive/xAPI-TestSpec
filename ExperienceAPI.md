@@ -1177,13 +1177,258 @@ among actors and objects, and should always strive to map as much information as
 possible into the built in elements, in order to leverage interoperability among 
 Experience API conformant tools.  
 
-<a name="rtcom"/> 
+<a name="rtcom"/>
+# 6.0 Runtime Communication
+
 <a name="encoding"/> 
+## 6.1 Encoding:
+All strings must be encoded and interpreted as UTF-8.  
+
 <a name="versionheader"/> 
+## 6.2 Version Header:
+Requests to an LRS MUST include an HTTP header with name "X-Experience-API-Version" 
+to indicate what version of the specification was used to construct the request. 
+For systems written against this version of the specification, the value should 
+always be "0.95". If an LRS cannot fulfill the request due to version 
+incompatibilities, it MUST reject the request with a response of 400 and an 
+error message explaining the problem. Conversely, every response from an LRS 
+MUST include the HTTP header "X-Experience-API-Version" to indicate the version 
+of the specification that was used to process the request.  
+
+The versions of the request and response will typically agree, but the version 
+returned from the LRS may be higher in the case of compatible versions 
+(i.e. the client has sent a 0.95 request which can be processed correctly 
+under the 1.0 specification). The LRS MUST NOT attempt to process a request 
+under the rules of a version less than that specified in the request (i.e. 
+an LRS will not attempt to process a 1.0 request using the 0.95 specification). 
+In such cases, the LRS will return a 400 error and an explanation of the problem.  
+
+Clients should use the lowest version of the specification which is compatible 
+with the latest released version, and provides all the features the client needs. 
+This will enable those clients to work with LRSs that only support the compatible 
+earlier version specified by the client, as well as those that support the latest 
+version.  
+
+An LRS supporting the latest version MUST use that version to process requests 
+from older compatible versions, rather than having a parallel implementation for 
+those versions. However, in the case of incompatible versions, the LRS MAY have 
+a concurrent implementation to process legacy requests. While it is imperative 
+that this specification strives for backwards compatibility, this behavior would 
+allow clients to transition smoothly over time if breaking changes became 
+unavoidable.  
+
 <a name="concurrency"/> 
-<a name="security"/> 
+## 6.3 Concurrency:
+In order to prevent "lost edits" due to API consumers PUT-ing changes based on 
+old data, XAPI will use HTTP 1.1 entity tags 
+([ETags](http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.19)) 
+to implement optimistic concurrency control in the portions of the API 
+where PUT may overwrite existing data. (State API, Actor and Activity 
+profile APIs). The requirements in the rest of this "Concurrency" section 
+only apply to those APIs.  
+
+When responding to a GET request, the LRS will add an ETag HTTP header to the 
+response. The value of this header must be a hexidecimal string of the 
+SHA-1 digest of the contents, and must be enclosed in quotes.  
+
+The reason for specifying the LRS ETag format is to allow API consumers that 
+can't read the ETag header to calculate it themselves.  
+
+When responding to a PUT request, the LRS must handle the 
+[If-Match](http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.24) 
+header or [If-None-Match](http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.26) 
+header as described in RFC2616, HTTP 1.1, if the If-Match header contains an 
+ETag, or the If-None-Match header contains "*". In the first case, this is to 
+detect modifications made after the consumer last fetched the document, and in 
+the second case, this is to detect when there is a resource present that the 
+consumer is not aware of.  
+
+In either of the above cases, if the header precondition specified fails, 
+the LRS must return HTTP status 412 "Precondition Failed", and make no 
+modification to the resource.  
+
+XAPI consumers should use these headers to avoid concurrency problems. The State 
+API will permit PUT statements without concurrency headers, since state conflicts 
+are unlikely. For other APIs that use PUT (Actor and Activity Profile), the 
+headers are required. If a PUT request is received without either header for a 
+resource that already exists, the LRS must return HTTP status 409 "Conflict", 
+and return a plain text body explaining that the consumer must check the current 
+state of the resource and set the “If-Match” header with the current ETag to 
+resolve the conflict. In this case, the LRS must make no modification to the resource.  
+
+<a name="security"/>
+## 6.4 Security:
+
+The LRS will support authentication using at least one of the following methods:  
+- OAuth 1.0 ([rfc5849](http://tools.ietf.org/html/rfc5849)), with signature 
+methods of "HMAC-SHA1", "RSA-SHA1", and "PLAINTEXT"
+- HTTP Basic Authentication
+- Common Access Cards (implementation details to follow in a later version)
+
+There are a number of expected authentication scenarios to consider for the XAPI. 
+In all cases, the LRS is responsible for making, or delegating, decisions on the 
+validity of statements, and determining what operations may be performed based 
+on the credentials used. It must be possible to configure any LRS to completely 
+support the XAPI using any of the above authentication methods, and any of the 
+workflows describe below. However, LRS may only support favored authentication 
+mechanisms, or limit the known users or registered applications that may 
+authenticate at all or using a specific authentication type. This is to allow 
+administrators to strike the desired balance between interoperability and security.  
+
+In particular, the "PLAINTEXT" signature method of OAuth and HTTP Basic 
+Authentication are likely to be turned off by security focused LRS administrators. 
+Therefore LRS administrators are urged to minimally leave OAuth enabled, with at 
+least the signature methods of "HMAC-SHA1" and "RSA-SHA1", and XAPI consumers 
+are urged to use OAuth with one of those signature methods to maximize interoperability.  
+ 
 <a name="authdefs"/> 
+### 6.4.1 Authentication Definitions:
+
+A __registered application__ is an application that will authenticate to the 
+LRS as an OAuth consumer that has been registered with the LRS. As part of 
+that registration the application's name and a unique consumer key (identifier) 
+shall be recorded by the LRS. Either the application has been assigned a consumer 
+secret, or it has recorded its public key. The LRS must provide a mechanism to 
+complete this registration, or delegate to another system that provides such a 
+mechanism. The means by which this registration is accomplished are not defined 
+by OAuth or the XAPI.  
+
+A __known user__ is a user account on the LRS, or on a system which the LRS 
+trusts to define users.  
+
+The following authentication workflows are anticipated.  
+
+__1) Registered Application + Known User__  
+
+This is the standard workflow for OAuth. Use the endpoints described further 
+below to complete the standard OAuth workflow.  
+
+If this form of authentication is used to record statements and no authority 
+is specified, the LRS should record the authority as a group consisting of 
+an Agent representing the registered application, and a Person representing 
+the known user.  
+
+__2) Registered Application + Unknown User__  
+
+An LRS may choose to trust certain applications to access the XAPI without 
+additional user credentials, that is without invoking the authorize or token 
+steps of the OAuth workflow. In that case, the LRS will consider requests 
+valid that are signed using OAuth with that application"s credentials and with 
+an empty token and token secret. In this case, the application must have been 
+registered with the LRS.  
+
+If this form of authentication is used to record statements and no authority 
+is specified, the LRS should record the authority as the Agent representing 
+the registered application.  
+
+__3) Unregistered Application + Known User__
+
+The following must be applied to the standard OAuth workflow:  
+
+Since the application is not registered, its representing Agent will not be 
+identified in the same way as a registered Agent, and the LRS must be careful 
+about making assumptions regarding identity. See the section on Authority. A 
+blank consumer secret should be used. The "Temporary Credential" request 
+should then be called. Along with the usual parameters, "consumer_name" should 
+be specified. During the user authentication phase, this name will be displayed 
+to the user, along with a warning that the identity of the application 
+requesting authentication cannot be verified.  
+
+Since OAuth is specifying an application, even though it is unverified, the LRS 
+MUST record an authority that includes both that application and the 
+authenticating user, as a group.  
+
+__4) Known User, no application__  
+
+This workflow uses 
+[HTTPBasicAuthentication](http://www.w3.org/Protocols/HTTP/1.0/spec.html%22%20%5Cl%20%22BasicAA). 
+A username/password combination corresponding to an LRS login should be used, 
+and the LRS should record the authority as an Agent identified by the login used, 
+unless another authority is specified and the LRS trusts the known user to specify 
+that authority.  
+
+__5) No Authentication__  
+
+Some LRSs may wish to support API access with no authentication, possibly for 
+testing purposes, although there is no requirement to do so. To distinguish an 
+explicitly unauthenticated request from a request that should be given a HTTP 
+Basic Authentication challenge, unauthenticated requests should include headers 
+for HTTP Basic Authentication based on a blank username and password.  
+
 <a name="oauthscope"/> 
+### 6.4.2 OAuth Authorization Scope
+The LRS will accept a scope parameter as defined in 
+[OAuth 2.0](https://tools.ietf.org/html/draft-ietf-oauth-v2-22%22%20%5Cl%20%22section-3.3). 
+If no scope is specified, a requested scope of "statements/write" and 
+"statements/read/mine" will be assumed. The list of scopes determines the set 
+of permissions that is being requested. An API client should request only the 
+minimal needed scopes, to increase the chances that the request will be granted.  
+
+LRSs are not required to support any of these scopes except “all”. These are 
+recommendations for scopes which should enable an LRS and an application 
+communicating using the XAPI to negotiate a level of access which accomplishes 
+what the application needs while minimizing the potential for misuse. The 
+limitations of each scope are in addition to any security limitations placed on 
+the user account associated with the request.  
+
+For example, an instructor might grant "statements/read" to a reporting tool, 
+but the LRS would still limit that tool to statements that the instructor 
+could read if querying the LRS with their credentials directly (such as 
+statements relating to their students).  
+
+XAPI scope values:  
+<table>
+	<tr><th>Scope</th><th>Permission</th></tr>
+	<tr><td>statements/write</td><td>write any statement</td></tr>
+	<tr>
+		<td>statements/read/mine</td>
+		<td>read statements written by "me", that is with an authority 
+			matching what the LRS would assign if writing a statement with 
+			the current token.
+		</td>
+	</tr>
+	<tr><td>statements/read</td><td>read any statement</td>
+	<tr>
+		<td>state</td>
+		<td>read/write state data, limited to activities and actors 
+			associated with the current token to the extent it is 
+			possible to determine this relationship.
+		</td>
+	</tr>
+	<tr>
+		<td>define</td>
+		<td>(re)Define activities and actors. If storing a statement 
+			when this is not granted, IDs will be saved and the LRS 
+			may save the original statement for audit purposes, but 
+			should not update its internal representation of any 
+			actors or activities.
+		</td>
+	</tr>
+	<tr>
+		<td>profile</td>
+		<td>read/write profile data, limited to activities and actors 
+			associated with the current token to the extent it is 
+			possible to determine this relationship.
+		</td>
+	</tr>
+	<tr><td>all/read</td><td>unrestricted read access</td></tr>
+	<tr><td>all</td><td>unrestricted access</td></tr>
+</table>
+
+__OAuth Extended Parameters__  
+Note that the parameters "consumer_name" and "scope" are not part of 
+OAuth 1.0, and therefore if used should be passed as query string or form 
+parameters, not in the OAuth header.  
+
+__OAuth Endpoints__  
+Temporary Credential Request:  
+http://example.com/XAPI/OAuth/initiate  
+
+Resource Owner Authorization:  
+http://example.com/XAPI/OAuth/authorize  
+
+Token Request:  
+http://example.com/XAPI/OAuth/token  
 <a name="datatransfer"/> 
 <a name="errorcodes"/> 
 <a name="stmtapi"/> 
