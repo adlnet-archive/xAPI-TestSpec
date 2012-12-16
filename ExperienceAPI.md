@@ -1816,8 +1816,328 @@ Returns: 200 OK - List of IDs
 	</tr>
 </table>  
 
-<a name="cors"/> 
+<a name="cors"/>
+## 7.6 Cross Origin Requests:
+One of the goals of the XAPI is to allow cross-domain tracking, and even though 
+XAPI seeks to enable tracking from applications other than browsers, browsers 
+still need to be supported. Internet Explorer 8 and 9 do not implement Cross 
+Origin Resource Sharing, but rather use their own Cross Domain Request API, 
+which can not use all of the XAPI as describe above due to only supporting "GET" 
+and "POST", and not allowing HTTP headers to be set.  
+
+The following describes alternate syntax for consumers to use only when unable 
+to use the usual syntax for specific calls due to the restrictions mentioned 
+above. All LRSs must support this syntax.  
+
+__Method__: All XAPI requests issued must be POST. The intended XAPI method 
+must be included as the only query string parameter on the request. 
+(ex: /XAPI/statements?method=PUT)  
+
+__Headers__: Any required parameters which are expected to appear in the HTTP 
+header must instead be included as a form parameter with the same name.  
+
+__Content__: If the XAPI call involved sending content, that content must now 
+be encoded and included as a form parameter called "content". The LRS will 
+interpret this content as a UTF-8 string, storing binary data is not supported 
+with this syntax.  
+
+See [Appendix B](#AppendixB) for an example function written in Javascript 
+which transforms a normal request into one using this alternate syntax.  
+ 
 <a name="validation"/> 
+## 7.7 Validation:
+The function of the LRS within the XAPI is to store and retrieve statements. 
+As long as it has sufficient information to perform these tasks, it is 
+expected that it does them. Validation of statements in the Experience API is 
+focused solely on syntax, not semantics. It is required to enforce rules 
+regarding structure, but not rules regarding meaning. Enforcing the rules that 
+ensure valid meaning among verb definitions, activity types, and extensions is 
+a responsibility carried out by community of practice, in any way they see fit.  
+
 <a name="AppendixA"/> 
-<a name="AppendixB"/> 
+# Appendix A: Bookmarklet
+
+XAPI enables using an "I learned this" bookmarklet to self-report learning. 
+The following is an example of such a bookmarklet, and the statement that this 
+bookmarklet would send if used on the page: http://scorm.com/xapi.  
+
+The bookmarklet would be provided by the LRS to track to, for a specific user. 
+Therefore the LRS URL, authentication, and actor information is hard coded in 
+the bookmarklet. Note that since the authorization token must be included in 
+the bookmarklet, the LRS should provide a token with limited privileges, 
+ideally only enabling the storage of self-reported learning statements.  
+
+The UUID generation is only necessary since the PUT method is being used, if a 
+statement is POSTED without an ID the LRS will generate it.  
+
+In order to allow cross-domain reporting of statements, a browser that supports 
+the "Access-Control-Allow-Origin" and "Access-Control-Allow-Methods" headers 
+must be used, such as IE 8+, FF 3.5+, Safari 4+, Safari iOS Chrome, or Android 
+browser. Additionally the server must set the required headers.  
+
+```javascript
+var url = "http://localhost:8080/XAPI/Statements/?statementId="+_ruuid();
+var auth = "Basic dGVzdDpwYXNzd29yZA==";
+var statement = {actor:{ "objectType": "Agent", "mbox" : "mailto:learner@example.adlnet.gov"},verb:"",object:{id:"" }};
+var definition = statement.object.definition;
+
+
+statement.verb='http://adlnet.gov/expapi/verbs/experienced';
+statement.object.id = window.location.toString();
+definition.type="http://adlnet.gov/expapi/activities/link";
+
+var xhr = new XMLHttpRequest();
+xhr.open("PUT", url, true);
+xhr.setRequestHeader("Content-Type", "application/json");
+xhr.setRequestHeader("Authorization", auth);
+xhr.onreadystatechange = function() {
+if(xhr.readyState == 4 ) {
+alert(xhr.status + " : " + xhr.responseText);
+}
+};
+xhr.send(JSON.stringify(statement));
+
+/*!
+Modified from: Math.uuid.js (v1.4)
+http://www.broofa.com
+mailto:robert@broofa.com
+
+Copyright (c) 2010 Robert Kieffer
+Dual licensed under the MIT and GPL licenses.
+*/
+function _ruuid() {
+return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+return v.toString(16);
+});
+}
+```
+
+__Example Statement Using Bookmarklet__  
+
+__Headers:__  
+```
+{ 
+	"content-type": "application/json; charset=UTF-8",
+	"authorization": "d515309a-044d-4af3-9559-c041e78eb446",
+	"referer": "http://adlnet.gov/xapi/",
+	"content-length": "###",
+	"origin": "http://adlnet.gov" }
+```
+
+__Method Path:__  
+```
+PUT : /XAPI/Statements/?statementId=ed1d064a-eba6-45ea-a3f6-34cdf6e1dfd9
+
+Body:
+{
+	"actor": {
+		"objectType": "Agent",
+		"mbox": "mailto:learner@example.adlnet.gov"
+	},
+	"verb": "http://adlnet.gov/expapi/verbs/experienced",
+	"object": {
+		"id": "http://adlnet.gov/xapi/ ",
+		"definition": {
+			"type": "http://adlnet.gov/expapi/activities/link"
+		}
+	}
+}
+```
+<a name="AppendixB"/>
+# Appendix B: Creating an “IE Mode” Request
+```javascript
+function getIEModeRequest(method, url, headers, data){
+
+	var newUrl = url;
+
+	// Everything that was on query string goes into form vars
+	var formData = new Array();
+	var qsIndex = newUrl.indexOf('?');
+	if(qsIndex > 0){
+		formData.push(newUrl.substr(qsIndex+1));
+		newUrl = newUrl.substr(0, qsIndex);
+	}
+
+	// Method has to go on querystring, and nothing else
+	newUrl = newUrl + '?method=' + method;
+
+	// Headers
+	if(headers !== null){
+		for(var headerName in headers){
+			formData.push(
+				headerName + "=" + 
+					encodeURIComponent(
+						headers[headerName]));
+		}
+	}
+
+	// The original data is repackaged as "content" form var
+	if(data !== null){
+		formData.push('content=' + encodeURIComponent(data));
+	}
+
+	return {
+		"method":"POST",
+		"url":newUrl,
+		"headers":{},
+		"data":formData.join("&")
+	};
+}
+``` 
 <a name="AppendixC"/>   
+# Appendix C: Example definitions for activities of type “cmi.interaction”
+
+__true-false__  
+
+```
+"definition": {
+	"description": {"en-US": "Does the XAPI include the concept of statements?"},
+	"type": "http://adlnet.gov/expapi/activities/cmi.interaction",
+	"interactionType": "true-false",
+	"correctResponsesPattern": ["true"]
+}
+```
+
+__choice__  
+```
+"definition": {
+	"description": {"en-US": "Which of these prototypes are available at the beta site?"},
+	"type": "http://adlnet.gov/expapi/activities/cmi.interaction",
+	"interactionType": "multiple-choice",
+	"correctResponsesPattern": ["golf[,]tetris"],
+	"choices": [
+		{"id": "golf", "description": {"en-US": "Golf Example"}},
+		{"id": "facebook", "description": {"en-US": "Facebook App"}},
+		{"id": "tetris", "description": {"en-US": "Tetris Example"}},
+		{"id": "scrabble", "description": {"en-US": "Scrabble Example"}}
+	]
+}
+```
+
+__fill-in__  
+```
+"definition": {
+	"description": {"en-US": "Ben is often heard saying: "},
+	"type": "http://adlnet.gov/expapi/activities/cmi.interaction",
+	"interactionType": "fill-in",
+	"correctResponsesPattern": ["Bob’s your uncle"]
+}
+```
+
+__likert__  
+```
+"definition": {
+	"description": {"en-US": "How awesome is Experience API?"},
+	"type": "http://adlnet.gov/expapi/activities/cmi.interaction",
+	"interactionType": "likert",
+	"correctResponsesPattern": ["likert_3"],
+	"scale": [
+		{"id": "likert_0", "description": {"en-US": "It’s OK"}},
+		{"id": "likert_1", "description": {"en-US": "It’s Pretty Cool"}},
+		{"id": "likert_2", "description": {"en-US": "It’s Damn Cool"}},
+		{"id": "likert_3", "description": {"en-US": "It’s Gonna Change the World"}}
+	]
+}
+```
+
+__matching__  
+```
+{
+	"definition":{
+		"description":{"en-US":"Match these people to their kickball team:"},
+		"type":"http://adlnet.gov/expapi/activities/cmi.interaction",
+		"interactionType":"matching",
+		"correctResponsesPattern":[
+			"ben[.]3[,]chris[.]2[,]troy[.]4[,]freddie[.]1"
+		],
+		"source":[
+			{
+				"id":"ben",
+				"description":{"en-US":"Ben"}
+			},
+			{
+				"id":"chris",
+				"description":{"en-US":"Chris"}
+			},
+			{
+				"id":"troy",
+				"description":{"en-US":"Troy"}
+			},
+			{
+				"id":"freddie",
+				"description":{"en-US":"Freddie"}
+			}
+		],
+		"target":[
+			{
+				"id":"1",
+				"description":{"en-US":"SCORM Engine"}
+			},
+			{
+				"id":"2",
+				"description":{"en-US":"Pure-sewage"}
+			},
+			{
+				"id":"3",
+				"description":{"en-US":"Project Tin Can API"}
+			},
+			{
+				"id":"4",
+				"description":{"en-US":"SCORM Cloud"}
+			}
+		]
+	}
+}
+```
+
+__performance__  
+```
+"definition": {
+	"description": {"en-US": "This interaction measures performance over a day of RS sports:"},
+	"type": "http://adlnet.gov/expapi/activities/cmi.interaction",
+	"interactionType": "performance",
+	"correctResponsesPattern": ["pong[.]1:[,]dg[.]:10[,]lunch[.]"],
+	"steps": [
+		{"id": "pong", "description": {"en-US": "Net pong matches won"}},
+		{"id": "dg", "description": {"en-US": "Strokes over par in disc golf at Liberty"}},
+		{"id": "lunch", "description": {"en-US": "Lunch having been eaten"}}
+	]
+}
+```
+
+__sequencing__  
+```
+"definition": {
+	"description": {"en-US": "Order players by their pong ladder position:"},
+	"type": "http://adlnet.gov/expapi/activities/cmi.interaction",
+	"interactionType": "sequencing",
+	"correctResponsesPattern": ["tim[,]mike[,]ells[,]ben"],
+	"choices": [
+		{"id": "tim", "description": {"en-US": "Tim"}},
+		{"id": "ben", "description": {"en-US": "Ben"}},
+		{"id": "ells", "description": {"en-US": "Ells"}},
+		{"id": "mike", "description": {"en-US": "Mike"}}
+	]
+}
+```
+
+__numeric__  
+```
+"definition": {
+	"description": {"en-US": "How many jokes is Chris the butt of each day?"},
+	"type": "http://adlnet.gov/expapi/activities/cmi.interaction",
+	"interactionType": "numeric",
+	"correctResponsesPattern": ["4:"]
+}
+```
+
+__other__  
+```
+"definition": {
+	"description": {"en-US": "On this map, please mark Franklin, TN"},
+	"type": "http://adlnet.gov/expapi/activities/cmi.interaction",
+	"interactionType": "other",
+	"correctResponsesPattern": ["(35.937432,-86.868896)"]
+}
+```
