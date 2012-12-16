@@ -607,7 +607,7 @@ this field should include an "objectType" field. If not specified, the object
 is assumed to be an Activity.  
 
 <a name="activity"/>
-#### 4.1.4.1 – Activity as “object”
+#### 4.1.4.1 – Activity as "object"
 A statement may represent a Learning Activity as an object in the statement.  
 <table>
 	<tr><th>Property</th><th>Description</th></tr>
@@ -755,9 +755,102 @@ an interaction activity with the given interactionType.
 >See [Appendix C](#AppendixC) for examples of activity definitions for each of the cmi.interaction types.
 
 <a name="agentasobj"/>
-<a name="stmtasobj"/> 
+#### 4.1.4.2 - Agent or Group as "object"
+A statement may specify an Agent as an object in the statement. Agents that do 
+this MUST specify an "objectType" property.  See [section 4.1.2](#actor) for details 
+regarding Agents.  
+
+<a name="stmtasobj"/>
+#### 4.1.4.3 - Statement as "object"
+Another statement may be used as an object in the statement, though some 
+restrictions apply depending on whether the included statement is new, or is 
+simply a reference to an existing statement.  
+
+<a name="substmt"/>
+__Sub-Statements__  
+When a new statement is included as part of another statement, it is considered 
+a sub-statement, and is subject to certain restrictions. Sub-statements may only 
+be included as parts of other statements, MUST specify an "objectType" property 
+with the value "SubStatement", and MUST NOT have the "id", "stored", "authority", 
+or "voided" properties. They will be considered part of the parent statement, 
+and MUST NOT contain a sub-statement. Implementations MUST validate the 
+sub-statement as they would other statements, with the addition of these rules.
+
+One interesting use of sub-statements is in creating statements of intention. 
+For example, using sub-statements we can create statements of the form 
+"<I> <planned> (<I> <did> <this>)" to indicate that we've planned to take some 
+action. The concrete example that follows logically states that
+ "I planned to read 'Some Awesome Book'".  
+
+```
+{
+	"actor": {"objectType": "Agent", "mbox":"mailto:test@example.com" },
+	"verb" : { "id":"http://example.com/planned", "display":{"en-US":"planned"} },
+	"object": {
+		"objectType": "SubStatement",
+		"actor" : {"objectType": "Agent", "mbox":"mailto:test@example.com" },
+		"verb" : { "id":"http://example.com/read", "display":{"en-US":"read"} },
+		"object": {
+			"id":"http://example.com/book",
+			"definition": { "name" : {"en-US":"Some Awesome Book"}}
+		}
+	}
+}
+```
+<a name="stmtref"/>
+__Statement References__  
+When an existing statement is included as part of another statement, a statement 
+reference should be used. A statement reference is a simple object consisting 
+an "objectType" property, which MUST be "StatementRef", and an "id" property, 
+which MUST be set to the UUID of a statement which is present on the system.  
+
+Statement references are typically used in scenarios such as commenting or grading, 
+and in the special case of voiding (see [section 4.1.10](#voided) for details on 
+voiding statements). Assuming that some statement has already been stored with 
+the ID 8f87ccde-bb56-4c2e-ab83-44982ef22df0, the following example shows how a 
+comment could be issued on the original statement, using a new statement:  
+
+```
+{
+	"actor" : { "objectType": "Agent", "mbox":"mailto:test@example.com" },
+	"verb" : { "id":"http://example.com/commented", "display": {"en-US":"commented"} },
+	"object" : {
+		"objectType":"StatementRef",
+		"id":"8f87ccde-bb56-4c2e-ab83-44982ef22df0"
+	},
+	"result" : { "response" : "Wow, nice work!" }
+}
+``` 
+
 <a name="result"/>
+### 4.1.5 Result:
+The result field represents a measured outcome related to the statement, such 
+as completion, success, or score. It is also extendible to allow for arbitrary 
+measurements to be included.
+
+<table>
+	<tr><th>Property</th><th>Description</th></tr>
+	<tr><td>score</td><td><a href="#score">Score</a> object (or not specified) - see section 4.1.5.1</td></tr>
+	<tr><td>success</td><td>true, false, or not specified</td></tr>
+	<tr><td>completion</td><td>true, false, or not specified</td></tr>
+	<tr><td>response</td><td>A string response appropriately formatted for the given activity.</td></tr>
+	<tr>
+		<td>duration</td>
+		<td>Period of time over which the statement occurred. Formatted 
+			according to ISO 8601, with a precision of 0.01 seconds.</td>
+	</tr>
+	<tr><td>extensions</td><td>A map of other properties as needed (see extensions)</td></tr>
+</table>
 <a name="score"/> 
+#### 4.1.5.1 Score
+<table>
+	<tr><th>Property</th><th>Description</th></tr>
+	<tr><td>scaled</td><td>cmi.score.scaled (recommended)</td></tr>
+	<tr><td>raw</td><td>cmi.score.raw</td></tr>
+	<tr><td>min</td><td>cmi.score.min</td></tr>
+	<tr><td>max</td><td>cmi.score.max</td><tr>
+</table>
+
 <a name="context"/> 
 <a name="timestamp"/> 
 <a name="stored"/> 
