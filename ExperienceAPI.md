@@ -1876,9 +1876,9 @@ must be used, such as IE 8+, FF 3.5+, Safari 4+, Safari iOS Chrome, or Android
 browser. Additionally the server must set the required headers.  
 
 ```javascript
-var url = "http://localhost:8080/XAPI/Statements/?statementId="+_ruuid();
-var auth = "Basic dGVzdDpwYXNzd29yZA==";
-var statement = {actor:{ "objectType": "Agent", "mbox" : "mailto:learner@example.adlnet.gov"},verb:"",object:{id:"" }};
+var url = "http://localhost:8080/XAPI/Statements/?statementId="+_ruuid();
+var auth = "Basic dGVzdDpwYXNzd29yZA==";
+var statement = {actor:{ "objectType": "Agent", "mbox" : "mailto:learner@example.adlnet.gov"},verb:"",object:{id:""}};
 var definition = statement.object.definition;
 
 
@@ -1888,11 +1888,11 @@ definition.type="http://adlnet.gov/expapi/activities/link";
 
 var xhr = new XMLHttpRequest();
 xhr.open("PUT", url, true);
-xhr.setRequestHeader("Content-Type", "application/json");
+xhr.setRequestHeader("Content-Type", "application/json");
 xhr.setRequestHeader("Authorization", auth);
 xhr.onreadystatechange = function() {
-if(xhr.readyState == 4 ) {
-alert(xhr.status + " : " + xhr.responseText);
+if(xhr.readyState == 4) {
+alert(xhr.status + " : " + xhr.responseText);
 }
 };
 xhr.send(JSON.stringify(statement));
@@ -1906,8 +1906,8 @@ Copyright (c) 2010 Robert Kieffer
 Dual licensed under the MIT and GPL licenses.
 */
 function _ruuid() {
-return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
 return v.toString(16);
 });
 }
@@ -1966,7 +1966,7 @@ function getIEModeRequest(method, url, headers, data){
 	if(headers !== null){
 		for(var headerName in headers){
 			formData.push(
-				headerName + "=" + 
+				headerName + "=" +
 					encodeURIComponent(
 						headers[headerName]));
 		}
