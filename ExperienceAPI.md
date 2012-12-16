@@ -1284,7 +1284,7 @@ are urged to use OAuth with one of those signature methods to maximize interoper
 <a name="authdefs"/> 
 ### 6.4.1 Authentication Definitions:
 
-A **registered application** is an application that will authenticate to the 
+A <b>registered application</b> is an application that will authenticate to the 
 LRS as an OAuth consumer that has been registered with the LRS. As part of 
 that registration the application's name and a unique consumer key (identifier) 
 shall be recorded by the LRS. Either the application has been assigned a consumer 
@@ -1293,7 +1293,7 @@ complete this registration, or delegate to another system that provides such a
 mechanism. The means by which this registration is accomplished are not defined 
 by OAuth or the XAPI.  
 
-A **known user** is a user account on the LRS, or on a system which the LRS 
+A <b>known user</b> is a user account on the LRS, or on a system which the LRS 
 trusts to define users.  
 
 The following authentication workflows are anticipated.  
