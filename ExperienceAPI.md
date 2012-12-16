@@ -1341,7 +1341,7 @@ authenticating user, as a group.
 __4) Known User, no application__  
 
 This workflow uses 
-[HTTPBasicAuthentication](http://www.w3.org/Protocols/HTTP/1.0/spec.html%22%20%5Cl%20%22BasicAA). 
+[HTTP Basic Authentication](http://www.w3.org/Protocols/HTTP/1.0/spec.html%22%20%5Cl%20%22BasicAA). 
 A username/password combination corresponding to an LRS login should be used, 
 and the LRS should record the authority as an Agent identified by the login used, 
 unless another authority is specified and the LRS trusts the known user to specify 
@@ -1429,8 +1429,28 @@ http://example.com/XAPI/OAuth/authorize
 
 Token Request:  
 http://example.com/XAPI/OAuth/token  
+
 <a name="datatransfer"/> 
+# 7.0 Data Transfer (REST)
+This section describes The XAPI consists of 4 sub-APIs: statement, state, 
+learner, and activity profile. The four sub-APIs of the Experience API 
+are handled via RESTful HTTP methods. The statement API can be used by itself 
+to track learning records.  
+
 <a name="errorcodes"/> 
+# 7.1 Error Codes
+The list below offers some general guidance on HTTP error codes that may 
+be returned from various methods in the API. An LRS MUST return an error 
+code appropriate to the error condition, and SHOULD return a message in the 
+response explaining the cause of the error.  
+- 400 Bad Request - MAY be returned by any method of the API, and indicates an error condition caused by an invalid or missing argument. The term "invalid arguments" includes malformed JSON or invalid object structures.
+- 401 Unauthorized - Indicates that authentication is required, or in the case authentication has been posted in the request, that the given credentials have been refused.
+- 403 Forbidden - Indicates that the request is unauthorized for the given credentials. Note this is different than refusing the credentials given. In this case, the credentials have been validated, but the authenticated client is not allowed to perform the given action.
+- 404 Not Found - Indicates the requested resource was not found. May be returned by any method that returns a uniquely identified resource, for instance, any state or profile API call targeting a specific document, or the method to retrieve a single statement.
+- 409 Conflict - Indicates an error condition due to a conflict with the current state of a resource, in the case of state and profile API calls, or in the statement PUT call. See section 6.3 for more details.
+- 412 Precondition Failed - Indicates an error condition due to a failure of a precondition posted with the request, in the case of state and profile API calls. See section 6.3 for more details.
+- 500 Internal Server Error - General error condition, typically indicating an unexpected exception in processing on the server.
+
 <a name="stmtapi"/> 
 <a name="stateapi"/> 
 <a name="actprofapi"/> 
