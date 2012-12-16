@@ -1438,7 +1438,7 @@ are handled via RESTful HTTP methods. The statement API can be used by itself
 to track learning records.  
 
 <a name="errorcodes"/> 
-# 7.1 Error Codes
+## 7.1 Error Codes
 The list below offers some general guidance on HTTP error codes that may 
 be returned from various methods in the API. An LRS MUST return an error 
 code appropriate to the error condition, and SHOULD return a message in the 
@@ -1467,10 +1467,10 @@ calls. See section 6.3 for more details.
 unexpected exception in processing on the server.
 
 <a name="stmtapi"/> 
-# 7.2 Statement API:
+## 7.2 Statement API:
 The basic communication mechanism of the Experience API.  
 
-## PUT http://example.com/XAPI/statements
+### PUT http://example.com/XAPI/statements
 
 Stores statement with the given ID. This MUST NOT modify an existing statement. 
 If the statement ID already exists, the receiving system SHOULD verify the 
@@ -1488,7 +1488,7 @@ Returns: 204 No Content
 	<tr><td>statementId</td><td>String</td><td> </td><td>ID of statement to record</td></tr>
 </table>
 
-## POST http://example.com/XAPI/statements
+### POST http://example.com/XAPI/statements
 
 Stores a statement, or a set of statements. Since the PUT method targets a specific 
 statement ID, POST must be used rather than PUT to save multiple statements, or to 
@@ -1500,7 +1500,7 @@ that provide a lot of data to the LRS.
 
 Returns: 200 OK, statement ID(s) (UUID).  
 
-## GET http://example.com/XAPI/statements
+### GET http://example.com/XAPI/statements
 
 This method may be called to fetch a single statement, if the statementId 
 parameter is specified, or a list of statements otherwise, filtered by the 
@@ -1601,6 +1601,76 @@ form fields if necessary. The LRS will differentiate a POST to add a statement
 or to list statements based on the parameters passed.  
 
 <a name="stateapi"/> 
+## 7.3 State API:
+Generally, this is a scratch area for activity providers that do not have their 
+own internal storage, or need to persist state across devices. When using the 
+state API, be aware of how the stateId parameter affects the semantics of the 
+call. If it is included, the GET and DELETE methods will act upon a single 
+defined state document identified by "stateId". Otherwise, GET will return the 
+available IDs, and DELETE will delete all state in the context given through the 
+other parameters.  
+
+### PUT | GET | DELETE http://example.com/XAPI/activities/state
+Stores, fetches, or deletes the document specified by the given stateId that 
+exists in the context of the specified activity, agent, and registration (if specified).  
+
+Returns: (PUT | DELETE) 204 No Content, (GET) 200 OK - State Content  
+<table>
+	<tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+	<tr><td>activityId</td><td>String</td><td>yes</td>
+		<td>The activity ID associated with this state</td>
+	</tr>
+	<tr><td>agent</td><td>(JSON/XML)</td><td>yes</td>
+		<td>The agent associated with this state</td>
+	</tr>
+	<tr><td>registration</td><td>UUID</td><td>no</td>
+		<td>The registration ID associated with this state.</td>
+	</tr>
+	<tr><td>stateId</td><td>String</td><td>yes</td>
+		<td>The id for this state, within the given context.</td>
+	</tr>
+</table>
+
+### GET http://example.com/XAPI/activities/state
+Fetches IDs of all state data for this context (activity + agent \[ + 
+registration if specified\]). If “since” parameter is specified, this 
+is limited to entries that have been stored or updated since the specified 
+timestamp (exclusive).  
+
+Returns: 200 OK, Array of IDs  
+<table>
+	<tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+	<tr><td>activityId</td><td>String</td><td>yes</td>
+		<td>The activity ID associated with these states.</td>
+	</tr>
+	<tr><td>agent</td><td>(JSON/XML)</td><td>yes</td>
+		<td>The actor associated with these states.</td>
+	</tr>
+	<tr><td>registration</td><td>UUID</td><td>no</td>
+		<td>The registration ID associated with these states.</td>
+	</tr>
+	<tr><td>since</td><td>Timestamp</td><td>no</td>
+		<td>Only IDs of states stored since the specified timestamp (exclusive) are returned.</td>
+	</tr>
+</table>
+
+## DELETE http://example.com/XAPI/activities/state
+Deletes all state data for this context (activity + agent \[+ registration if 
+specified\]).  
+
+Returns: 204 No Content  
+<table>
+	<tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+	<tr><td>activityId</td><td>String</td><td>yes</td>
+		<td>The activity ID associated with this state</td>
+	</tr>
+	<tr><td>agent</td><td>(JSON/XML)</td><td>yes</td>
+		<td>The actor associated with this state</td>
+	</tr>
+	<tr><td>registration</td><td>UUID</td><td>no</td>
+		<td>The registration ID associated with this state.</td>
+	</tr>
+</table>
 <a name="actprofapi"/> 
 <a name="agentprofapi"/> 
 <a name="cors"/> 
