@@ -9,24 +9,25 @@
 # Table of Contents
 [1.0. Revision History](#revhistory)  
 [2.0. Role of the Experience API](#roleofxapi)  
-    [2.1. ADL's Role in the Experience API](#adlrole)  
+	[2.1. ADL's Role in the Experience API](#adlrole)  
     [2.2. Contributors](#contributors)  
-      [2.2.1. Working Group Participants](#wg)  
-      [2.2.2. Requirements Gathering Participants](#reqparticipants)  
+		[2.2.1. Working Group Participants](#wg)  
+		[2.2.2. Requirements Gathering Participants](#reqparticipants)  
 [3.0. Definitions](#defintions)  
-    [Tin Can API (TCAPI)](#tcapi)  
+	[Tin Can API (TCAPI)](#tcapi)  
 [4.0. Statement](#statement)  
     [4.1. Statement Properties](#stmtprops)  
-      [4.1.1. ID](#stmtid)  
-      [4.1.2. Actor](#actor)  
-      [4.1.3. Verb](#verb)  
-      [4.1.4. Object](#object)  
-      [4.1.5. Result](#result)  
-      [4.1.6. Context](#context)  
-      [4.1.7. Timestamp](#timestamp)  
-      [4.1.8. Stored](#stored)  
-      [4.1.9. Authority](#authority)  
-      [4.1.10. Voided](#voided)  
+		[4.1.1. ID](#stmtid)  
+		[4.1.2. Actor](#actor)  
+		[4.1.3. Verb](#verb)  
+		[4.1.4. Object](#object)  
+		[4.1.5. Result](#result)  
+		[4.1.6. Context](#context)  
+		[4.1.7. Timestamp](#timestamp)  
+		[4.1.8. Stored](#stored)  
+		[4.1.9. Authority](#authority)  
+		[4.1.10. Voided](#voided)  
+		[4.1.11. Metadata](#metadata)  
     [4.2. Retrieval of Statements](#retstmts)  
 [5.0. Miscellaneous Types](#misctypes)  
     [5.1. Document](#miscdocument)  
@@ -37,8 +38,8 @@
     [6.2. Version Header](#versionheader)  
     [6.3. Concurrency](#concurrency)  
     [6.4. Security](#security)  
-      [6.4.1. Authentication Definitions](#authdefs)  
-      [6.4.2. OAuth Authorization Scope](#oauthscope)  
+		[6.4.1. Authentication Definitions](#authdefs)  
+		[6.4.2. OAuth Authorization Scope](#oauthscope)  
 [7.0. Data Transfer (REST)](#datatransfer)  
     [7.1. Error Codes](#errorcodes)  
     [7.2. Statement API](#stmtapi)  
@@ -957,10 +958,146 @@ into some broader activity.
 	</tr>
 </table>
  
-<a name="timestamp"/> 
+<a name="timestamp"/>
+### 4.1.7 Timestamp:
+The time at which the statement took place, formatted according to 
+[ISO 8601](https://en.wikipedia.org/wiki/ISO_8601%22%20%5Cl%20%22Durations). 
+Note that this can differ from the system time of the event, such as in the 
+case of formal or informal learning that occurs outside of the system.  
+
 <a name="stored"/> 
+### 4.1.8 Stored: 
+The LRS stored version of timestamp, formatted according to 
+[ISO 8601](https://en.wikipedia.org/wiki/ISO_8601%22%20%5Cl%20%22Durations). 
+It is recognized that the content time stamping of a statement (via the 
+"timestamp" field) may differ from the LRS storage time, due to delays in 
+reporting or as a statement is propagated to other systems.  
+
 <a name="authority"/> 
-<a name="voided"/> 
+### 4.1.9 Authority:
+The authority property provides information about who or what has asserted that 
+this statement is true. Consequently, the asserting authority may be an 
+[Agent](#agent) (representing the authenticating user or some system or 
+application), or in the case of 3-legged OAuth workflows, a [Group](#group) 
+of two Agents representing an application and user together. 
+Unless used in the aforementioned 3-legged OAuth workflow, a Group MUST NOT 
+be used to assert authority.  
+
+If a statement is stored using a validated OAuth connection, and the LRS creates 
+or modifies the authority property of the statement, the authority MUST contain 
+an agent object that represents the OAuth consumer, either by itself, or as part 
+of a group in the case of 3-legged OAuth. This agent MUST be identified by account, 
+and MUST use the consumer key as the account name field. If the OAuth consumer is 
+a registered application,then the token request endpoint MUST be used as the 
+account homePage, otherwise the temporary credentials endpoint must be used as 
+the account homePage.  
+
+Except as specified in the paragraph above, agent objects MUST NOT use any OAuth 
+endpoint as an account homePage.  
+
+The behavior of an LRS SHOULD NOT rely on Agents with an account using the 
+temporary credentials endpoint as the homePage and with matching account names 
+coming from the same source, as there is no way to verify that, since multiple 
+unregistered applications could choose the same consumer key. Each unregistered 
+consumer SHOULD pick a unique consumer key.  
+
+If a statement is received from another, fully trusted LRS, an LRS MAY choose 
+not to overwrite the authority property received. Otherwise, an LRS MUST completely 
+ignore any provided authority property, and instead construct its own authority 
+property as described here. If a user connects directly (using HTTP Basic Auth) 
+or is included as part of a 3-legged OAuth workflow, the LRS MUST include the user 
+as an Agent in the authority, and MAY identify the user with any of the legal 
+identifying properties.  
+
+__OAuth Authorities__  
+
+In a 3-legged OAuth workflow, authentication involves both an OAuth consumer 
+and a user of the OAuth service provider. For instance, requests made by an 
+authorized Twitter plugin on your Facebook account will include credentials 
+that are specific not only to Twitter as a client application, or you as a 
+user, but the unique combination of both.  
+
+To support this concept, an LRS preparing the authority of a statement received 
+via 3-legged OAuth MUST use a pairing of an application and a user. Below is a 
+concrete example which represents a pairing of an OAuth consumer and a user.  
+
+```
+"authority": {
+	"objectType" : "group",
+	"member": [
+		{
+			"account": {
+				"homePage":"http://example.com/XAPI/OAuth/Token",
+				"name":"oauth_consumer_x75db"
+			}
+		},
+		{ "mbox":"mailto:bob@example.com" }
+	]
+}
+```
+<a name="voided"/>
+### 4.1.10 Voided:
+A key factor in enabling the distributed nature of Experience API is through 
+the immutability of statements. Because statements cannot be logically changed 
+or deleted, systems can be assured to have an accurate collection of data based 
+solely off of the stream of statements that are introduced into the LRS.  
+
+But, it is clear that statements may not always be valid for all of time once 
+they are made. Mistakes or other factors could require that some previous 
+statement is marked as invalid. For this case, the reserved 
+"http://adlnet.gov/expapi/verbs/voided" verb can be used, using a statement 
+reference to the invalid statement as the object. See ["Statement References"](#stmtref) 
+in section [4.1.4.3](#stmtasobj) for details.  
+
+An LRS which has received a statement that voids another statement should mark 
+the target statement as voided using the "voided" field. If the target statement 
+which is referenced cannot be found, the LRS should report an appropriate error 
+indicating as such.  
+
+When issuing a voiding statement, the object is required to have its "objectType" 
+field set to "Statement", and must specify the target statement's ID using the 
+"id" field. An example of a voiding statement follows:  
+ 
+```
+{
+	"actor" : {
+		"objectType": "Agent",
+		"name" : "Example Admin",
+		"mbox" : "mailto:admin@example.adlnet.gov"
+	},
+	"verb" : {
+		"id":"http://adlnet.gov/xapi/verbs#voided",
+		"display":{"en-US":"voided"}
+	},
+	"object" : {
+		"objectType":"StatementRef",
+		"id" : "e05aa883-acaf-40ad-bf54-02c8ce485fb0"
+	}
+}
+```  
+
+The above statement voids a previous statement which is identified with the 
+statement ID "e05aa883-acaf-40ad-bf54-02c8ce485fb0". The previous statement 
+will now be marked by setting its “voided” flag to true. Any changes to activity 
+or agent definitions which were introduced by the voided statement may be rolled 
+back by the LRS, but this not required.  
+
+Any statement that voids another cannot itself be voided. An activity provider 
+that would like to "unvoid" a voided statement should reissue the statement under 
+a new ID. Though voided and voiding statements must be reported as usual through 
+the Experience API, it is recommended that reporting systems do not show voided 
+or voiding statements by default.  
+
+<a name="metadata"/>
+### 4.1.11 Metadata:
+The Experience API is extensible to allow any form of metadata, but recommends 
+that existing fields are used to convey information. While metadata is extremely 
+useful for the classification, storage, search, discovery, and retrieval of objects, 
+it is out of the scope of the Experience API. It is recommended that content 
+brokering services enforce metadata on created and distributed content and that 
+querying services create metadata from Experience API statements and other 
+available data.  
+
 <a name="retstmts"/> 
 <a name="misctypes"/> 
 <a name="miscdocument"/> 
